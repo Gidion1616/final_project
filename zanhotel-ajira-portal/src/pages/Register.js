@@ -1,146 +1,685 @@
-import React, { useState } from "react";
+import React, { useState } from 'react';
+import { motion } from 'framer-motion';
+import { useNavigate } from 'react-router-dom';
+import { 
+  FaEye, 
+  FaEyeSlash, 
+  FaUser, 
+  FaEnvelope, 
+  FaPhone, 
+  FaLock, 
+  FaFilePdf, 
+  FaImage,
+  FaBirthdayCake,
+  FaVenusMars,
+  FaMapMarkerAlt
+} from 'react-icons/fa';
 
-const Register = () => {
-  const [formData, setFormData] = useState({
-    fullName: "",
-    username: "",
-    email: "",
-    password: "",
-    confirmPassword: "",
-  });
+const RegisterWithProfileUpload = () => {
+  const initialFormState = {
+    fullName: '',
+    email: '',
+    phoneNumber: '',
+    password: '',
+    confirmPassword: '',
+    dateOfBirth: '',
+    gender: '',
+    address: '',
+    cv: null,
+    certificate: null,
+    photo: null,
+  };
 
+  const [formData, setFormData] = useState(initialFormState);
   const [errors, setErrors] = useState({});
   const [submitted, setSubmitted] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [apiError, setApiError] = useState(null);
+  const navigate = useNavigate();
 
   const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+    if (e.target.type === 'file') {
+      setFormData({ ...formData, [e.target.name]: e.target.files[0] });
+      setErrors(prev => ({ ...prev, [e.target.name]: null }));
+    } else {
+      setFormData({ ...formData, [e.target.name]: e.target.value });
+      if (errors[e.target.name]) {
+        setErrors(prev => ({ ...prev, [e.target.name]: null }));
+      }
+    }
+    if (apiError) setApiError(null);
+  };
+
+  const validatePhoneNumber = (phone) => {
+    if (!phone.startsWith('+')) return 'Phone number must start with +';
+    
+    const numberPart = phone.substring(1);
+    if (!/^\d+$/.test(numberPart)) return 'Phone number must contain only digits after +';
+    
+    if (phone.startsWith('+255') && phone.length !== 13) {
+      return 'Tanzania phone number must be 12 digits after + (e.g., +255123456789)';
+    } 
+    
+    if (phone.length > 13) return 'Phone number must not exceed 13 characters';
+    
+    return '';
+  };
+
+  const validateDateOfBirth = (dob) => {
+    if (!dob) return 'Date of birth is required';
+    
+    const birthDate = new Date(dob);
+    const today = new Date();
+    const minAgeDate = new Date();
+    minAgeDate.setFullYear(today.getFullYear() - 16); // Minimum 16 years old
+    
+    if (birthDate > minAgeDate) {
+      return 'You must be at least 16 years old to register';
+    }
+    
+    return '';
   };
 
   const validate = () => {
     const newErrors = {};
-    if (!formData.fullName.trim()) newErrors.fullName = "Full name is required";
-    if (!formData.username.trim()) newErrors.username = "Username is required";
-    if (!formData.email.includes("@")) newErrors.email = "Valid email is required";
-    if (formData.password.length < 6) newErrors.password = "Password must be at least 6 characters";
-    if (formData.password !== formData.confirmPassword) newErrors.confirmPassword = "Passwords do not match";
+    
+    if (!formData.fullName.trim()) newErrors.fullName = 'Full name is required';
+    if (!formData.email.includes('@')) newErrors.email = 'Valid email is required';
+    
+    if (!formData.phoneNumber.trim()) {
+      newErrors.phoneNumber = 'Phone number is required';
+    } else {
+      const phoneError = validatePhoneNumber(formData.phoneNumber);
+      if (phoneError) newErrors.phoneNumber = phoneError;
+    }
+    
+    if (formData.password.length < 6) {
+      newErrors.password = 'Password must be at least 6 characters';
+    } else if (!/[A-Z]/.test(formData.password)) {
+      newErrors.password = 'Password must contain at least one uppercase letter';
+    } else if (!/[0-9]/.test(formData.password)) {
+      newErrors.password = 'Password must contain at least one number';
+    }
+    
+    if (formData.password !== formData.confirmPassword) {
+      newErrors.confirmPassword = 'Passwords do not match';
+    }
+
+    // New field validations
+    if (!formData.dateOfBirth) {
+      newErrors.dateOfBirth = 'Date of birth is required';
+    } else {
+      const dobError = validateDateOfBirth(formData.dateOfBirth);
+      if (dobError) newErrors.dateOfBirth = dobError;
+    }
+
+    if (!formData.gender) {
+      newErrors.gender = 'Gender is required';
+    }
+
+    if (!formData.address?.trim()) {
+      newErrors.address = 'Address is required';
+    }
+
+    if (!formData.cv) {
+      newErrors.cv = 'CV is required';
+    } else if (formData.cv.type !== 'application/pdf') {
+      newErrors.cv = 'CV must be a PDF file';
+    }
+
+    if (!formData.certificate) {
+      newErrors.certificate = 'certificate is required';
+    } else if (formData.certificate.type !== 'application/pdf') {
+      newErrors.certificate = 'certificate must be a PDF file';
+    }
+
+    if (!formData.photo) {
+      newErrors.photo = 'Photo is required';
+    } else if (!formData.photo.type.startsWith('image/')) {
+      newErrors.photo = 'Photo must be an image file (JPG/PNG)';
+    }
+
     return newErrors;
   };
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    const validationErrors = validate();
-    setErrors(validationErrors);
-    if (Object.keys(validationErrors).length === 0) {
-      console.log("Form submitted:", formData);
-      setSubmitted(true);
-      // TODO: Send data to backend API
+  const handleSubmit = async (e) => {
+  e.preventDefault();
+  setIsLoading(true);
+  setApiError(null);
+
+  const validationErrors = validate();
+  setErrors(validationErrors);
+
+  if (Object.keys(validationErrors).length === 0) {
+    try {
+      const formDataToSend = new FormData();
+      formDataToSend.append('email', formData.email.toLowerCase().trim());
+      formDataToSend.append('password', formData.password);
+      formDataToSend.append('confirm_password', formData.confirmPassword);
+      formDataToSend.append('full_name', formData.fullName.trim());
+      formDataToSend.append('phone_number', formData.phoneNumber.trim());
+      formDataToSend.append('date_of_birth', formData.dateOfBirth);
+      formDataToSend.append('gender', formData.gender);
+      formDataToSend.append('address', formData.address.trim());
+      formDataToSend.append('cv', formData.cv);
+      formDataToSend.append('certificate', formData.certificate);
+      formDataToSend.append('photo', formData.photo);
+
+      const response = await fetch('http://localhost:8000/api/jobseeker/register/', {
+        method: 'POST',
+        body: formDataToSend,
+      });
+
+      const data = await response.json();
+
+      if (response.status >= 200 && response.status < 300) {
+        // Registration successful
+        setSubmitted(true);
+
+        // --- Add authentication handling here ---
+        if (data.token) {
+          localStorage.setItem('token', data.token);
+          localStorage.setItem('userRole', 'jobseeker');
+          localStorage.setItem('user_id', data.user_id || '');
+          localStorage.setItem('phone_number', data.phone_number || '');
+          localStorage.setItem('user', JSON.stringify(data.user || {}));
+        }
+
+        setFormData(initialFormState);
+
+        // Redirect to dashboard or login page
+        setTimeout(() => navigate('/dashboard'), 2000);
+        return;
+      }
+
+      // Handle backend validation errors
+      if (data.errors) {
+        const frontendErrors = {};
+        Object.keys(data.errors).forEach(key => {
+          const frontendKey = 
+            key === 'full_name' ? 'fullName' :
+            key === 'phone_number' ? 'phoneNumber' :
+            key === 'confirm_password' ? 'confirmPassword' :
+            key === 'date_of_birth' ? 'dateOfBirth' :
+            key;
+          frontendErrors[frontendKey] = data.errors[key].join(' ');
+        });
+        setErrors(frontendErrors);
+      } else {
+        setApiError(data.detail || data.message || 'Registration failed. Please try again.');
+      }
+
+    } catch (error) {
+      console.error('Registration error:', error);
+      setApiError('Network error. Please check your connection and try again.');
+    } finally {
+      setIsLoading(false);
     }
+  } else {
+    setIsLoading(false);
+  }
+};
+
+  const getError = (fieldName) => errors[fieldName] || null;
+
+  const styles = {
+    container: {
+      maxWidth: '500px',
+      margin: '40px auto',
+      padding: '30px',
+      border: '1px solid #ddd',
+      borderRadius: '15px',
+      backgroundColor: '#fff',
+      boxShadow: '0 10px 30px rgba(0, 0, 0, 0.1)',
+    },
+    heading: {
+      textAlign: 'center',
+      marginBottom: '25px',
+      color: '#333',
+      fontSize: '24px',
+      fontWeight: '600',
+    },
+    inputContainer: {
+      position: 'relative',
+      display: 'flex',
+      alignItems: 'center',
+      marginBottom: '15px',
+    },
+    icon: {
+      position: 'absolute',
+      left: '15px',
+      color: '#666',
+    },
+    input: {
+      width: '100%',
+      padding: '12px 15px 12px 40px',
+      marginBottom: '5px',
+      borderRadius: '8px',
+      border: '1px solid #ddd',
+      fontSize: '14px',
+      transition: 'all 0.3s',
+    },
+    select: {
+      width: '100%',
+      padding: '12px 15px 12px 40px',
+      marginBottom: '5px',
+      borderRadius: '8px',
+      border: '1px solid #ddd',
+      fontSize: '14px',
+      backgroundColor: '#fff',
+      appearance: 'none',
+    },
+    inputError: {
+      borderColor: '#ff4d4d',
+      backgroundColor: '#fff9f9',
+    },
+    toggleButton: {
+      position: 'absolute',
+      right: '15px',
+      background: 'none',
+      border: 'none',
+      color: '#666',
+      cursor: 'pointer',
+      fontSize: '16px',
+    },
+    button: {
+      width: '100%',
+      padding: '14px',
+      backgroundColor: '#4a6bff',
+      color: '#fff',
+      border: 'none',
+      borderRadius: '8px',
+      cursor: 'pointer',
+      fontSize: '16px',
+      fontWeight: '600',
+      marginTop: '20px',
+      transition: 'all 0.3s',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      gap: '8px',
+    },
+    buttonLoading: {
+      opacity: 0.7,
+      cursor: 'not-allowed',
+    },
+    spinner: {
+      display: 'inline-block',
+      width: '16px',
+      height: '16px',
+      border: '2px solid rgba(255,255,255,0.3)',
+      borderRadius: '50%',
+      borderTopColor: '#fff',
+      animation: 'spin 1s ease-in-out infinite',
+    },
+    error: {
+      color: '#ff4d4d',
+      fontSize: '12px',
+      marginTop: '-10px',
+      marginBottom: '15px',
+    },
+    apiError: {
+      color: '#ff4d4d',
+      fontSize: '14px',
+      textAlign: 'center',
+      marginBottom: '20px',
+      padding: '10px',
+      backgroundColor: '#fff9f9',
+      borderRadius: '8px',
+      border: '1px solid #ffcccc',
+    },
+    label: {
+      display: 'flex',
+      alignItems: 'center',
+      fontWeight: '500',
+      margin: '15px 0 8px',
+      color: '#444',
+      fontSize: '14px',
+    },
+    fileInput: {
+      width: '100%',
+      padding: '10px',
+      borderRadius: '8px',
+      border: '1px solid #ddd',
+      fontSize: '14px',
+      transition: 'all 0.3s',
+    },
+    success: {
+      color: '#4BB543',
+      fontSize: '16px',
+      textAlign: 'center',
+      marginBottom: '20px',
+      fontWeight: '500',
+    },
+    form: {
+      display: 'flex',
+      flexDirection: 'column',
+    },
   };
 
   return (
-    <div style={styles.container}>
-      <h2 style={styles.heading}>Zan-Hotel-Ajira-Portal Registration</h2>
-      {submitted && <p style={styles.success}>Registration successful!</p>}
-      <form onSubmit={handleSubmit} style={styles.form}>
-        <input
-          type="text"
-          name="fullName"
-          placeholder="Full Name"
-          value={formData.fullName}
-          onChange={handleChange}
-          style={styles.input}
-        />
-        {errors.fullName && <p style={styles.error}>{errors.fullName}</p>}
+    <motion.div 
+      initial={{ opacity: 0, y: -20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5 }}
+      style={styles.container}
+    >
+      <motion.h2 
+        style={styles.heading}
+        initial={{ scale: 0.9 }}
+        animate={{ scale: 1 }}
+        transition={{ delay: 0.2 }}
+      >
+        Register & Complete Your Profile
+      </motion.h2>
+      
+      {submitted ? (
+        <motion.p 
+          style={styles.success}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+        >
+          Registration successful! Redirecting to login...
+        </motion.p>
+      ) : (
+        <>
+          {apiError && (
+            <motion.div
+              style={styles.apiError}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+            >
+              {apiError}
+            </motion.div>
+          )}
 
-        <input
-          type="text"
-          name="username"
-          placeholder="Username"
-          value={formData.username}
-          onChange={handleChange}
-          style={styles.input}
-        />
-        {errors.username && <p style={styles.error}>{errors.username}</p>}
+          <form onSubmit={handleSubmit} style={styles.form} encType="multipart/form-data">
+            {/* Existing fields */}
+            <motion.div
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: 0.3 }}
+            >
+              <div style={styles.inputContainer}>
+                <FaUser style={styles.icon} />
+                <input
+                  type="text"
+                  name="fullName"
+                  placeholder="Full Name"
+                  value={formData.fullName}
+                  onChange={handleChange}
+                  style={{
+                    ...styles.input,
+                    ...(getError('fullName') && styles.inputError)
+                  }}
+                />
+              </div>
+              {getError('fullName') && (
+                <motion.p style={styles.error}>
+                  {getError('fullName')}
+                </motion.p>
+              )}
+            </motion.div>
 
-        <input
-          type="email"
-          name="email"
-          placeholder="Email Address"
-          value={formData.email}
-          onChange={handleChange}
-          style={styles.input}
-        />
-        {errors.email && <p style={styles.error}>{errors.email}</p>}
+            <motion.div
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: 0.4 }}
+            >
+              <div style={styles.inputContainer}>
+                <FaEnvelope style={styles.icon} />
+                <input
+                  type="email"
+                  name="email"
+                  placeholder="Email Address"
+                  value={formData.email}
+                  onChange={handleChange}
+                  style={{
+                    ...styles.input,
+                    ...(getError('email') && styles.inputError)
+                  }}
+                />
+              </div>
+              {getError('email') && (
+                <motion.p style={styles.error}>
+                  {getError('email')}
+                </motion.p>
+              )}
+            </motion.div>
 
-        <input
-          type="password"
-          name="password"
-          placeholder="Password"
-          value={formData.password}
-          onChange={handleChange}
-          style={styles.input}
-        />
-        {errors.password && <p style={styles.error}>{errors.password}</p>}
+            <motion.div
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: 0.5 }}
+            >
+              <div style={styles.inputContainer}>
+                <FaPhone style={styles.icon} />
+                <input
+                  type="text"
+                  name="phoneNumber"
+                  placeholder="Phone Number (e.g., +255123456789)"
+                  value={formData.phoneNumber}
+                  onChange={handleChange}
+                  style={{
+                    ...styles.input,
+                    ...(getError('phoneNumber') && styles.inputError)
+                  }}
+                />
+              </div>
+              {getError('phoneNumber') && (
+                <motion.p style={styles.error}>
+                  {getError('phoneNumber')}
+                </motion.p>
+              )}
+            </motion.div>
 
-        <input
-          type="password"
-          name="confirmPassword"
-          placeholder="Confirm Password"
-          value={formData.confirmPassword}
-          onChange={handleChange}
-          style={styles.input}
-        />
-        {errors.confirmPassword && <p style={styles.error}>{errors.confirmPassword}</p>}
+            {/* New Fields */}
+            <motion.div
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: 0.55 }}
+            >
+              <div style={styles.inputContainer}>
+                <FaBirthdayCake style={styles.icon} />
+                <input
+                  type="date"
+                  name="dateOfBirth"
+                  value={formData.dateOfBirth}
+                  onChange={handleChange}
+                  style={{
+                    ...styles.input,
+                    ...(getError('dateOfBirth') && styles.inputError)
+                  }}
+                />
+              </div>
+              {getError('dateOfBirth') && (
+                <motion.p style={styles.error}>
+                  {getError('dateOfBirth')}
+                </motion.p>
+              )}
+            </motion.div>
 
-        <button type="submit" style={styles.button}>Register</button>
-      </form>
-    </div>
+            <motion.div
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: 0.6 }}
+            >
+              <div style={styles.inputContainer}>
+                <FaVenusMars style={styles.icon} />
+                <select
+                  name="gender"
+                  value={formData.gender}
+                  onChange={handleChange}
+                  style={{
+                    ...styles.select,
+                    ...(getError('gender') && styles.inputError)
+                  }}
+                >
+                  <option value="">Select Gender</option>
+                  <option value="Male">Male</option>
+                  <option value="Female">Female</option>
+                  <option value="Other">Other</option>
+                </select>
+              </div>
+              {getError('gender') && (
+                <motion.p style={styles.error}>
+                  {getError('gender')}
+                </motion.p>
+              )}
+            </motion.div>
+
+            <motion.div
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: 0.65 }}
+            >
+              <div style={styles.inputContainer}>
+                <FaMapMarkerAlt style={styles.icon} />
+                <input
+                  type="text"
+                  name="address"
+                  placeholder="Full Address"
+                  value={formData.address}
+                  onChange={handleChange}
+                  style={{
+                    ...styles.input,
+                    ...(getError('address') && styles.inputError)
+                  }}
+                />
+              </div>
+              {getError('address') && (
+                <motion.p style={styles.error}>
+                  {getError('address')}
+                </motion.p>
+              )}
+            </motion.div>
+
+            {/* Password fields */}
+            <motion.div
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: 0.7 }}
+            >
+              <div style={styles.inputContainer}>
+                <FaLock style={styles.icon} />
+                <input
+                  type={showPassword ? 'text' : 'password'}
+                  name="password"
+                  placeholder="Password"
+                  value={formData.password}
+                  onChange={handleChange}
+                  style={{
+                    ...styles.input,
+                    ...(getError('password') && styles.inputError)
+                  }}
+                />
+                <button 
+                  type="button" 
+                  onClick={() => setShowPassword(!showPassword)}
+                  style={styles.toggleButton}
+                >
+                  {showPassword ? <FaEyeSlash /> : <FaEye />}
+                </button>
+              </div>
+              {getError('password') && (
+                <motion.p style={styles.error}>
+                  {getError('password')}
+                </motion.p>
+              )}
+            </motion.div>
+
+            <motion.div
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: 0.75 }}
+            >
+              <div style={styles.inputContainer}>
+                <FaLock style={styles.icon} />
+                <input
+                  type={showConfirmPassword ? 'text' : 'password'}
+                  name="confirmPassword"
+                  placeholder="Confirm Password"
+                  value={formData.confirmPassword}
+                  onChange={handleChange}
+                  style={{
+                    ...styles.input,
+                    ...(getError('confirmPassword') && styles.inputError)
+                  }}
+                />
+                <button 
+                  type="button" 
+                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                  style={styles.toggleButton}
+                >
+                  {showConfirmPassword ? <FaEyeSlash /> : <FaEye />}
+                </button>
+              </div>
+              {getError('confirmPassword') && (
+                <motion.p style={styles.error}>
+                  {getError('confirmPassword')}
+                </motion.p>
+              )}
+            </motion.div>
+
+            {/* File upload fields */}
+            {['cv', 'certificate', 'photo'].map((field, index) => (
+              <motion.div
+                key={field}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.8 + index * 0.1 }}
+              >
+                <label style={styles.label}>
+                  {field === 'photo' ? <FaImage /> : <FaFilePdf />}
+                  {`Upload ${field.charAt(0).toUpperCase() + field.slice(1)} `}
+                  {field === 'photo' ? '(JPG/PNG)' : '(PDF)'}
+                </label>
+                <input
+                  type="file"
+                  name={field}
+                  accept={field === 'photo' ? 'image/*' : '.pdf'}
+                  onChange={handleChange}
+                  style={{
+                    ...styles.fileInput,
+                    ...(getError(field) && styles.inputError)
+                  }}
+                  required
+                />
+                {getError(field) && (
+                  <motion.p style={styles.error}>
+                    {getError(field)}
+                  </motion.p>
+                )}
+              </motion.div>
+            ))}
+
+            <motion.button 
+              type="submit" 
+              style={{
+                ...styles.button,
+                ...(isLoading && styles.buttonLoading)
+              }}
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 1.1 }}
+              disabled={isLoading}
+            >
+              {isLoading ? (
+                <>
+                  <span style={styles.spinner}></span>
+                  Registering...
+                </>
+              ) : 'Register'}
+            </motion.button>
+          </form>
+        </>
+      )}
+    </motion.div>
   );
 };
 
-const styles = {
-  container: {
-    maxWidth: "400px",
-    margin: "50px auto",
-    padding: "20px",
-    border: "1px solid #ddd",
-    borderRadius: "10px",
-    backgroundColor: "#f9f9f9",
-  },
-  heading: {
-    textAlign: "center",
-    marginBottom: "20px",
-  },
-  input: {
-    width: "100%",
-    padding: "10px",
-    margin: "10px 0",
-    borderRadius: "5px",
-    border: "1px solid #ccc",
-  },
-  button: {
-    width: "100%",
-    padding: "10px",
-    backgroundColor: "#007bff",
-    color: "#fff",
-    border: "none",
-    borderRadius: "5px",
-    cursor: "pointer",
-  },
-  error: {
-    color: "red",
-    fontSize: "14px",
-    marginTop: "-8px",
-  },
-  success: {
-    color: "green",
-    fontSize: "16px",
-    textAlign: "center",
-  },
-  form: {
-    display: "flex",
-    flexDirection: "column",
-  },
-};
-
-export default Register;
+export default RegisterWithProfileUpload;

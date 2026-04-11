@@ -5,28 +5,44 @@ const HotelRegistration = () => {
   const [hotelName, setHotelName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
   const handleRegister = async (e) => {
     e.preventDefault();
+    setLoading(true);
+
+    // Correct keys for Django serializer
+    const payload = {
+      hotel_name: hotelName,
+      email: email,
+      password: password,
+    };
+
     try {
       const response = await fetch("http://localhost:8000/api/hotel/register/", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ hotelName, email, password }),
+        body: JSON.stringify(payload),
       });
+
+      const result = await response.json();
 
       if (response.ok) {
         localStorage.setItem("hotelRegistered", "true");
         localStorage.setItem("hotelName", hotelName);
-        navigate("/hotel-dashboard");
+        alert("Registration successful!");
+        navigate("/hotel-login");
       } else {
-        const errorData = await response.json();
-        alert(errorData.error || "Registration failed");
+        // Show all validation errors
+        const errors = Object.values(result).flat().join("\n");
+        alert(errors || "Registration failed");
       }
     } catch (err) {
       console.error("Error:", err);
       alert("Server error");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -44,7 +60,7 @@ const HotelRegistration = () => {
         />
         <input
           type="email"
-          placeholder="Hotel Email"
+          placeholder="Email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           required
@@ -58,7 +74,9 @@ const HotelRegistration = () => {
           required
           style={styles.input}
         />
-        <button type="submit" style={styles.button}>Register</button>
+        <button type="submit" style={styles.button} disabled={loading}>
+          {loading ? "Registering..." : "Register"}
+        </button>
       </form>
     </div>
   );

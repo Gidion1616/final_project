@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
-function HotelLogin() {
+const HotelLogin = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const navigate = useNavigate();
@@ -9,60 +9,115 @@ function HotelLogin() {
   const handleLogin = async (e) => {
     e.preventDefault();
 
-    const response = await fetch("http://localhost:8000/api/hotel-login/", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        username: email, // DRF token auth uses 'username' even for email login
-        password: password
-      })
-    });
+    try {
+      const response = await fetch("http://localhost:8000/api/hotel/login/", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password }),
+      });
 
-    const data = await response.json();
+      const data = await response.json();
 
-    if (response.ok) {
-      localStorage.setItem("token", data.token);
-      localStorage.setItem("hotel_id", data.hotel_id);
-      localStorage.setItem("hotel_name", data.hotel_name);
-      localStorage.setItem("email", data.email);
-      alert("Login successful!");
-      navigate("/dashboard"); // or /hotel-home etc.
-    } else {
-      alert("Login failed. Check credentials.");
+      if (response.ok) {
+        alert("Login successful ✅");
+
+        // ✅ Standardized storage (IMPORTANT)
+        localStorage.setItem("token", data.token); // 🔥 FIXED
+        localStorage.setItem("hotel_name", data.hotel_name);
+        localStorage.setItem("hotel_id", data.hotel_id);
+        localStorage.setItem("email", data.email);
+        localStorage.setItem("hotelLoggedIn", "true");
+
+        navigate("/hotel-dashboard");
+      } else {
+        alert(data.error || "Login failed ❌");
+      }
+    } catch (error) {
+      console.error("Error:", error);
+      alert("Server error");
     }
   };
 
   return (
-    <div className="p-4 max-w-md mx-auto mt-10 shadow-md rounded-lg">
-      <h2 className="text-2xl font-bold mb-4 text-center">Hotel Login</h2>
-      <form onSubmit={handleLogin}>
-        <label className="block mb-2">Email:</label>
-        <input
-          type="email"
-          className="w-full border p-2 mb-4"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          required
-        />
+    <div style={styles.pageContainer}>
+      <div style={styles.formBox}>
+        <div style={styles.logo}>🏨</div>
+        <h2 style={styles.title}>Hotel Login</h2>
 
-        <label className="block mb-2">Password:</label>
-        <input
-          type="password"
-          className="w-full border p-2 mb-4"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          required
-        />
-
-        <button
-          type="submit"
-          className="w-full bg-blue-500 text-white p-2 rounded hover:bg-blue-600"
-        >
-          Login
-        </button>
-      </form>
+        <form onSubmit={handleLogin} style={styles.form}>
+          <input
+            type="email"
+            placeholder="Hotel Email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            required
+            style={styles.input}
+          />
+          <input
+            type="password"
+            placeholder="Password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            required
+            style={styles.input}
+          />
+          <button type="submit" style={styles.button}>
+            Login
+          </button>
+        </form>
+      </div>
     </div>
   );
-}
+};
+
+// Styling (unchanged)
+const styles = {
+  pageContainer: {
+    height: "100vh",
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center",
+    background:
+      "linear-gradient(-45deg, #0d2b57, #1a4b8c, #247ba0, #1b98e0)",
+  },
+  formBox: {
+    backgroundColor: "white",
+    padding: "30px",
+    borderRadius: "12px",
+    boxShadow: "0 8px 20px rgba(0,0,0,0.2)",
+    width: "100%",
+    maxWidth: "350px",
+    textAlign: "center",
+  },
+  logo: {
+    fontSize: "40px",
+    marginBottom: "10px",
+  },
+  title: {
+    marginBottom: "20px",
+    color: "#0d2b57",
+  },
+  form: {
+    display: "flex",
+    flexDirection: "column",
+  },
+  input: {
+    padding: "10px",
+    marginBottom: "15px",
+    borderRadius: "6px",
+    border: "1px solid #ccc",
+    fontSize: "14px",
+  },
+  button: {
+    padding: "10px",
+    backgroundColor: "#1a98e0",
+    color: "#fff",
+    border: "none",
+    borderRadius: "6px",
+    cursor: "pointer",
+    fontWeight: "600",
+    fontSize: "14px",
+  },
+};
 
 export default HotelLogin;

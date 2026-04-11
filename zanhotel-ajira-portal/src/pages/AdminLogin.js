@@ -15,7 +15,7 @@ const AdminLogin = () => {
     e.preventDefault();
 
     // Temporary hardcoded credentials
-    if (credentials.username === "admin" && credentials.password === "admin123") {
+    if (credentials.username === "Gidion" && credentials.password === "1234567890") {
       localStorage.setItem("adminToken", "fake-admin-token");
       navigate("/admin/dashboard");
     } else {

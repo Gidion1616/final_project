@@ -18,11 +18,17 @@ from django.contrib import admin
 from django.urls import path, include
 from django.conf.urls.static import static
 from django.conf import settings
+from jobApplication.views import applications_for_hotel 
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/hotel/', include('hotels.urls')),
     path('api/', include('jobs.urls')),
+    path('api/', include('jobseeker.urls')),
+    path('api/jobs/', include('jobApplication.urls')),
+    path("api/", include("complaint.urls")),
+    path('api/hotel/applications/', applications_for_hotel, name='hotel-applications'),
+   
 
 ]
 

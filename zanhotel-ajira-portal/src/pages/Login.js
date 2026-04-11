@@ -1,68 +1,92 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
-const Login = () => {
-  const [formData, setFormData] = useState({
-    email: "",
-    password: "",
-  });
-
-  const [errors, setErrors] = useState({});
-  const [submitted, setSubmitted] = useState(false);
+const JobseekerLogin = () => {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
 
-  const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
-  };
-
-  const validate = () => {
-    const newErrors = {};
-    if (!formData.email.includes("@")) newErrors.email = "Email is invalid";
-    if (formData.password.length < 6) newErrors.password = "Password must be at least 6 characters";
-    return newErrors;
-  };
-
-  const handleSubmit = (e) => {
+  const handleLogin = async (e) => {
     e.preventDefault();
-    const validationErrors = validate();
-    setErrors(validationErrors);
+    setIsLoading(true);
 
-    if (Object.keys(validationErrors).length === 0) {
-      // Simulate successful login
-      localStorage.setItem("token", "fake-token-123");
-      setSubmitted(true);
-      setTimeout(() => {
-        navigate("/dashboard"); // Redirect to dashboard
-      }, 1000);
+    try {
+      const response = await fetch("http://localhost:8000/api/jobseeker/login/", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password }),
+      });
+
+      const data = await response.json();
+      console.log("Login response:", data); // Debugging
+
+      
+
+if (response.ok) {
+  // Save token
+  localStorage.setItem("token", data.token);
+
+  // Save user info (from root keys, not nested user)
+  localStorage.setItem("user_id", data.user_id);
+  
+  
+  localStorage.setItem("phone_number", data.phone_number);
+
+  // If you still need full serialized user (from data.user)
+  localStorage.setItem("user", JSON.stringify(data.user));
+
+  // Add role
+  localStorage.setItem("userRole", "jobseeker");
+
+  // Redirect
+  navigate("/dashboard");
+
+
+
+
+
+
+
+
+      } else {
+        alert(data.error || "Invalid credentials");
+      }
+    } catch (err) {
+      console.error("Login error:", err);
+      alert("Server error. Please try again.");
+    } finally {
+      setIsLoading(false);
     }
   };
 
   return (
     <div style={styles.container}>
-      <h2 style={styles.heading}>Login</h2>
-      {submitted && <p style={styles.success}>Login successful! Redirecting...</p>}
-      <form onSubmit={handleSubmit} style={styles.form}>
+      <h2>Jobseeker Login</h2>
+      <form onSubmit={handleLogin} style={styles.form}>
         <input
           type="email"
-          name="email"
-          placeholder="Email Address"
-          value={formData.email}
-          onChange={handleChange}
+          placeholder="Email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          required
           style={styles.input}
         />
-        {errors.email && <p style={styles.error}>{errors.email}</p>}
-
         <input
           type="password"
-          name="password"
           placeholder="Password"
-          value={formData.password}
-          onChange={handleChange}
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          required
           style={styles.input}
         />
-        {errors.password && <p style={styles.error}>{errors.password}</p>}
-
-        <button type="submit" style={styles.button}>Login</button>
+        <button
+          type="submit"
+          style={styles.button}
+          disabled={isLoading}
+        >
+          {isLoading ? "Logging in..." : "Login"}
+        </button>
       </form>
     </div>
   );
@@ -71,46 +95,34 @@ const Login = () => {
 const styles = {
   container: {
     maxWidth: "400px",
-    margin: "50px auto",
-    padding: "20px",
-    border: "1px solid #ddd",
-    borderRadius: "10px",
+    margin: "60px auto",
+    padding: "30px",
     backgroundColor: "#f9f9f9",
-  },
-  heading: {
-    textAlign: "center",
-    marginBottom: "20px",
-  },
-  input: {
-    width: "100%",
-    padding: "10px",
-    margin: "10px 0",
-    borderRadius: "5px",
-    border: "1px solid #ccc",
-  },
-  button: {
-    width: "100%",
-    padding: "10px",
-    backgroundColor: "#007bff",
-    color: "#fff",
-    border: "none",
-    borderRadius: "5px",
-    cursor: "pointer",
-  },
-  error: {
-    color: "red",
-    fontSize: "14px",
-    marginTop: "-8px",
-  },
-  success: {
-    color: "green",
-    fontSize: "16px",
+    borderRadius: "10px",
+    boxShadow: "0 0 10px rgba(0,0,0,0.1)",
     textAlign: "center",
   },
   form: {
     display: "flex",
     flexDirection: "column",
   },
+  input: {
+    marginBottom: "15px",
+    padding: "10px",
+    fontSize: "16px",
+    border: "1px solid #ddd",
+    borderRadius: "4px",
+  },
+  button: {
+    padding: "12px",
+    backgroundColor: "#007bff",
+    color: "#fff",
+    border: "none",
+    borderRadius: "4px",
+    cursor: "pointer",
+    fontSize: "16px",
+    transition: "background-color 0.3s",
+  },
 };
 
-export default Login;
+export default JobseekerLogin;

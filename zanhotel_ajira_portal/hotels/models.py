@@ -1,10 +1,11 @@
+# hotels/models.py
 from django.db import models
-from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
+from django.contrib.auth.models import User
+from django.conf import settings
 
 class Hotel(models.Model):
-    name = models.CharField(max_length=255)
-    email = models.EmailField(unique=True)
-    password = models.CharField(max_length=255)  # Consider hashing in production
+    user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='hotel_profile')
+    hotel_name = models.CharField(max_length=100, unique=True)
 
     def __str__(self):
-        return self.name
+        return self.hotel_name

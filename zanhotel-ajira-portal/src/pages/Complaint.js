@@ -2,7 +2,7 @@ import React, { useState } from "react";
 
 const Complaint = () => {
   const [formData, setFormData] = useState({
-    fullName: "",
+    full_name: "",
     email: "",
     subject: "",
     message: "",
@@ -11,66 +11,92 @@ const Complaint = () => {
 
   const [errors, setErrors] = useState({});
   const [submitted, setSubmitted] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [serverError, setServerError] = useState("");
 
+  // Handle input changes
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
   };
 
+  // Handle file input
   const handleFileChange = (e) => {
     setFormData({ ...formData, file: e.target.files[0] });
   };
 
+  // Client-side validation
   const validate = () => {
     const newErrors = {};
-    if (!formData.fullName.trim()) newErrors.fullName = "Jina kamili linahitajika";
+    if (!formData.full_name.trim()) newErrors.full_name = "Jina kamili linahitajika";
     if (!formData.email.includes("@")) newErrors.email = "Barua pepe sahihi inahitajika";
     if (!formData.subject.trim()) newErrors.subject = "Kichwa cha malalamiko kinahitajika";
     if (!formData.message.trim()) newErrors.message = "Ujumbe wa malalamiko unahitajika";
     return newErrors;
   };
 
-  const handleSubmit = (e) => {
+  // Submit form
+  const handleSubmit = async (e) => {
     e.preventDefault();
+    setServerError("");
     const validationErrors = validate();
     setErrors(validationErrors);
+
     if (Object.keys(validationErrors).length === 0) {
+      setLoading(true);
+
       const complaintData = new FormData();
-      complaintData.append("fullName", formData.fullName);
+      complaintData.append("full_name", formData.full_name);
       complaintData.append("email", formData.email);
       complaintData.append("subject", formData.subject);
       complaintData.append("message", formData.message);
-      if (formData.file) {
-        complaintData.append("file", formData.file);
-      }
+      if (formData.file) complaintData.append("file", formData.file);
 
-      console.log("FormData sent to backend:", formData);
-      // TODO: Tuma `complaintData` kwa backend API kwa kutumia fetch/axios
-      setSubmitted(true);
-      setFormData({
-        fullName: "",
-        email: "",
-        subject: "",
-        message: "",
-        file: null,
-      });
+      try {
+        const response = await fetch("http://localhost:8000/api/complaints/", {
+          method: "POST",
+          body: complaintData,
+        });
+
+        if (!response.ok) {
+          const errData = await response.json();
+          throw new Error(JSON.stringify(errData));
+        }
+
+        setSubmitted(true);
+        setFormData({
+          full_name: "",
+          email: "",
+          subject: "",
+          message: "",
+          file: null,
+        });
+      } catch (err) {
+        console.error("Error submitting complaint:", err);
+        setServerError("Tatizo limejitokeza kwenye server. Tafadhali jaribu tena.");
+      } finally {
+        setLoading(false);
+      }
     }
   };
 
   return (
     <div style={styles.container}>
       <h2 style={styles.heading}>Ripoti Malalamiko</h2>
-      {submitted && <p style={styles.success}>Malalamiko yako yamepokelewa. Asante kwa kutujulisha!</p>}
-      <form onSubmit={handleSubmit} style={styles.form}>
+
+      {submitted && <p style={styles.success}>Malalamiko yako yamepokelewa. Asante!</p>}
+      {serverError && <p style={styles.error}>{serverError}</p>}
+
+      <form onSubmit={handleSubmit} style={styles.form} encType="multipart/form-data">
         <input
           type="text"
-          name="fullName"
+          name="full_name"
           placeholder="Jina Kamili"
-          value={formData.fullName}
+          value={formData.full_name}
           onChange={handleChange}
           style={styles.input}
         />
-        {errors.fullName && <p style={styles.error}>{errors.fullName}</p>}
+        {errors.full_name && <p style={styles.error}>{errors.full_name}</p>}
 
         <input
           type="email"
@@ -113,7 +139,9 @@ const Complaint = () => {
           </p>
         )}
 
-        <button type="submit" style={styles.button}>Tuma Malalamiko</button>
+        <button type="submit" style={styles.button} disabled={loading}>
+          {loading ? "Inatuma..." : "Tuma Malalamiko"}
+        </button>
       </form>
     </div>
   );

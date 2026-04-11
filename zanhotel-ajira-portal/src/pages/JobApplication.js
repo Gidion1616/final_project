@@ -1,157 +1,259 @@
-import React, { useState } from "react";
-import { useParams } from "react-router-dom";
+import React, { useState, useEffect } from "react";
+import { useParams, useNavigate } from "react-router-dom";
+import {
+  FaFilePdf,
+  FaImage,
+  FaUser,
+  FaEnvelope,
+  FaPhone,
+  FaBirthdayCake,
+  FaVenusMars,
+  FaMapMarkerAlt,
+  FaBriefcase
+} from "react-icons/fa";
 
-const JobApplication = () => {
-  const { id } = useParams(); // job ID from URL
-  const [formData, setFormData] = useState({
-    name: "",
-    email: "",
-    message: "",
-    cv: null,
-  });
+const JobApplicationForm = () => {
+  const { jobId } = useParams();
+  const navigate = useNavigate();
+
+  const [user, setUser] = useState(null);
+  const [jobDetails, setJobDetails] = useState(null);
 
   const [submitted, setSubmitted] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState("");
 
-  const handleChange = (e) => {
-    const { name, value, files } = e.target;
-    if (name === "cv") {
-      setFormData({ ...formData, cv: files[0] });
-    } else {
-      setFormData({ ...formData, [name]: value });
-    }
-  };
+  // -----------------------------
+  // FETCH JOB + USER (NO PROFILE)
+  // -----------------------------
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const token = localStorage.getItem("token");
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+        if (!token) {
+          setError("Authentication required");
+          setTimeout(() => navigate("/jobseeker/login"), 1500);
+          return;
+        }
 
-    const form = new FormData();
-    form.append("applicant_name", formData.name);
-    form.append("email", formData.email);
-    form.append("phone", formData.message); // using 'message' as 'phone'
-    form.append("cv", formData.cv);
-    form.append("job", id); // Foreign key to Job ID
+        // JOB
+        const jobRes = await fetch(
+          `http://localhost:8000/api/jobs/${jobId}/`,
+          {
+            headers: {
+              Authorization: `Token ${token}`,
+            },
+          }
+        );
+        const jobData = await jobRes.json();
+        setJobDetails(jobData);
 
-    try {
-      const response = await fetch("http://localhost:8000/api/jobs/apply/", {
-        method: "POST",
-        body: form,
-      });
+        // USER (NEW SOURCE)
+        const userRes = await fetch(
+          "http://localhost:8000/api/jobseeker/me/",
+          {
+            headers: {
+              Authorization: `Token ${token}`,
+            },
+          }
+        );
 
-      if (response.ok) {
-        setSubmitted(true);
-      } else {
-        const errorData = await response.json();
-        console.error("Error response:", errorData);
-        alert("Ushindwe kutuma maombi. Tafadhali hakikisha taarifa zako ni sahihi.");
+        if (!userRes.ok) {
+          throw new Error("Failed to load user data");
+        }
+
+        const userData = await userRes.json();
+        setUser(userData);
+      } catch (err) {
+        console.error(err);
+        setError("Failed to load application data");
+      } finally {
+        setIsLoading(false);
       }
-    } catch (error) {
-      console.error("Network/server error:", error);
-      alert("Tatizo la mtandao au seva. Tafadhali jaribu tena.");
-    }
-  };
+    };
 
+    fetchData();
+  }, [jobId, navigate]);
+
+  // -----------------------------
+  // SUBMIT APPLICATION
+  // -----------------------------
+  const handleSubmit = async () => {
+  setError("");
+
+  const token = localStorage.getItem("token");
+  if (!token) {
+    setError("Login required");
+    return;
+  }
+
+  if (!user) {
+    setError("User data not loaded");
+    return;
+  }
+
+  try {
+    const formData = new FormData();
+    formData.append("job", jobId);
+
+    const response = await fetch(
+      "http://localhost:8000/api/jobs/apply/",
+      {
+        method: "POST",
+        headers: {
+          Authorization: `Token ${token}`,
+        },
+        body: formData,
+      }
+    );
+
+    const data = await response.json();
+
+    // -----------------------------
+    // SUCCESS
+    // -----------------------------
+    if (response.ok) {
+      setSubmitted(true);
+
+      setTimeout(() => {
+        navigate("/dashboard");
+      }, 2000); // show success message for 2s
+
+    } 
+    // -----------------------------
+    // ERROR
+    // -----------------------------
+    else {
+      const message =
+        data.detail ||
+        (Array.isArray(data.non_field_errors) ? data.non_field_errors[0] : null) ||
+        "Application failed";
+
+      setError(message);
+
+      // ⬇️ redirect after showing error
+      setTimeout(() => {
+        navigate("/dashboard");
+      }, 3000);
+    }
+
+  } catch (err) {
+    console.error(err);
+    setError("Network error");
+
+    setTimeout(() => {
+      navigate("/dashboard");
+    }, 3000);
+  }
+};
+  // -----------------------------
+  // LOADING STATE
+  // -----------------------------
+  if (isLoading) {
+    return (
+      <div style={{ textAlign: "center", padding: 40 }}>
+        Loading...
+      </div>
+    );
+  }
+
+  // -----------------------------
+  // ERROR STATE
+  // -----------------------------
+  if (error) {
+    return (
+      <div style={{ padding: 20, color: "red", textAlign: "center" }}>
+        {error}
+      </div>
+    );
+  }
+
+  // -----------------------------
+  // SUCCESS STATE
+  // -----------------------------
+  if (submitted) {
+    return (
+      <div style={{ textAlign: "center", padding: 40 }}>
+        <h2>Application Submitted Successfully</h2>
+      </div>
+    );
+  }
+
+  // -----------------------------
+  // MAIN UI
+  // -----------------------------
   return (
     <div style={styles.container}>
-      <h2 style={styles.heading}>Tuma Maombi ya Kazi (Job ID: {id})</h2>
+      <h2 style={styles.heading}>Job Application</h2>
 
-      {submitted ? (
-        <p style={styles.success}>Asante! Maombi yako yametumwa kikamilifu.</p>
-      ) : (
-        <form onSubmit={handleSubmit} style={styles.form}>
-          <input
-            type="text"
-            name="name"
-            placeholder="Jina Kamili"
-            value={formData.name}
-            onChange={handleChange}
-            required
-            style={styles.input}
-          />
-
-          <input
-            type="email"
-            name="email"
-            placeholder="Barua Pepe"
-            value={formData.email}
-            onChange={handleChange}
-            required
-            style={styles.input}
-          />
-
-          <textarea
-            name="message"
-            placeholder="Namba ya Simu"
-            value={formData.message}
-            onChange={handleChange}
-            rows="4"
-            required
-            style={styles.textarea}
-          ></textarea>
-
-          <input
-            type="file"
-            name="cv"
-            accept=".pdf,.doc,.docx"
-            onChange={handleChange}
-            required
-            style={styles.input}
-          />
-
-          <button type="submit" style={styles.button}>
-            Tuma Maombi
-          </button>
-        </form>
+      {jobDetails && (
+        <p style={styles.subHeading}>
+          {jobDetails.title} @ {jobDetails.hotel_name}
+        </p>
       )}
+
+      {/* USER INFO */}
+      <div style={styles.section}>
+        <h3 style={styles.sectionTitle}>
+          <FaUser /> User Information
+        </h3>
+
+        <p><b>Name:</b> {user.full_name}</p>
+        <p><b>Email:</b> {user.email}</p>
+        <p><b>Phone:</b> {user.phone_number}</p>
+        <p><b>Address:</b> {user.address}</p>
+        <p><b>Gender:</b> {user.gender}</p>
+        <p><b>Date of Birth:</b> {user.date_of_birth}</p>
+        <p><b>CV:</b> {user.cv}</p>
+        <p><b>Certificates:</b> {user.certificate}</p>
+        <p><b>Photo:</b> {user.photo}</p>
+      </div>
+
+      {/* SUBMIT */}
+      <div style={styles.section}>
+        <button onClick={handleSubmit} style={styles.submitButton}>
+          Submit Application
+        </button>
+      </div>
     </div>
   );
 };
 
 const styles = {
   container: {
-    maxWidth: "500px",
-    margin: "40px auto",
-    padding: "20px",
-    border: "1px solid #ccc",
-    borderRadius: "10px",
-    backgroundColor: "#fdfdfd",
+    maxWidth: 800,
+    margin: "20px auto",
+    padding: 20,
   },
   heading: {
     textAlign: "center",
-    marginBottom: "20px",
+    marginBottom: 10,
   },
-  input: {
-    width: "100%",
-    padding: "10px",
-    marginBottom: "15px",
-    borderRadius: "5px",
-    border: "1px solid #ccc",
+  subHeading: {
+    textAlign: "center",
+    marginBottom: 20,
   },
-  textarea: {
-    width: "100%",
-    padding: "10px",
-    marginBottom: "15px",
-    borderRadius: "5px",
-    border: "1px solid #ccc",
-    resize: "vertical",
+  section: {
+    padding: 20,
+    marginBottom: 20,
+    border: "1px solid #ddd",
+    borderRadius: 8,
   },
-  button: {
-    width: "100%",
-    padding: "10px",
-    backgroundColor: "#007bff",
+  sectionTitle: {
+    display: "flex",
+    gap: 10,
+    alignItems: "center",
+  },
+  submitButton: {
+    padding: "12px 20px",
+    backgroundColor: "green",
     color: "white",
     border: "none",
-    borderRadius: "5px",
+    borderRadius: 6,
     cursor: "pointer",
-  },
-  success: {
-    textAlign: "center",
-    color: "green",
-    fontWeight: "bold",
-  },
-  form: {
-    display: "flex",
-    flexDirection: "column",
   },
 };
 
-export default JobApplication;
+export default JobApplicationForm;
+

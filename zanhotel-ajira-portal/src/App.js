@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { Routes, Route, Navigate, useLocation } from "react-router-dom";
 
 import Navbar from "./components/Navbar";
@@ -9,7 +9,7 @@ import Home from "./pages/Home";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import AboutUs from "./pages/AboutUs";
-import JobApplication from "./pages/JobApplication";
+import JobApplicationForm from "./pages/JobApplication";
 import Complaint from "./pages/Complaint";
 import UploadProfile from "./pages/UploadProfile";
 import MyApplications from "./pages/MyApplications";
@@ -18,7 +18,6 @@ import UserDashboard from "./pages/UserDashboard";
 
 import AdminLogin from "./pages/AdminLogin";
 import AdminDashboard from "./pages/AdminDashboard";
-
 import ViewComplaints from "./pages/ViewComplaints";
 import ManageJobs from "./pages/ManageJobs";
 import AdminProfile from "./pages/AdminProfile";
@@ -27,43 +26,67 @@ import HotelRegistration from "./pages/HotelRegistration";
 import HotelDashboard from "./pages/HotelDashboard";
 import PostJob from "./pages/hotel/PostJob";
 import ViewApplications from "./pages/hotel/ViewApplications";
+import HotelLogin from "./pages/HotelLogin";
+import UserTypeSelection from "./pages/UserTypeSelection";
+import EthicsAndTraining from "./pages/EthicsAndTraining";
 
 function App() {
   const location = useLocation();
+  const [apiError, setApiError] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
 
-  const isLoggedIn = localStorage.getItem("token") !== null;
-  const isProfileComplete = localStorage.getItem("isProfileComplete") === "true";
-  const isAdminLoggedIn = localStorage.getItem("adminToken") !== null;
-  const isHotelLoggedIn = localStorage.getItem("hotelRegistered") === "true";
+  const adminToken = localStorage.getItem("adminToken");
+  const hotelLoggedIn = localStorage.getItem("hotelLoggedIn") === "true";
 
-  const hideLayoutPaths = ["/admin/login", "/admin/dashboard", "/hotel-dashboard"];
-  const hideLayout = hideLayoutPaths.some((path) => location.pathname.startsWith(path));
+  // Hide Navbar/Footer on specific paths
+  const hideLayoutPaths = ["/admin/login", "/admin/dashboard", "/hotel-login", "/hotel-dashboard"];
+  const hideLayout = hideLayoutPaths.some((path) =>
+    location.pathname.startsWith(path)
+  );
 
   return (
     <>
       {!hideLayout && <Navbar />}
+      {isLoading && <div className="loading-spinner">Loading...</div>}
+      {apiError && (
+        <div className="error-message">
+          {apiError}
+          <button onClick={() => setApiError(null)}>Dismiss</button>
+        </div>
+      )}
 
       <Routes>
         {/* Public Routes */}
         <Route path="/" element={<Home />} />
         <Route path="/about" element={<AboutUs />} />
-        <Route path="/login" element={<Login />} />
-        <Route path="/register" element={<Register />} />
-        <Route path="/apply/:id" element={<JobApplication />} />
+        <Route path="/select-user" element={<UserTypeSelection />} />
+        <Route path="/apply/:jobId" element={<JobApplicationForm />} />
         <Route path="/complaint" element={<Complaint />} />
-        <Route path="/upload-profile" element={<UploadProfile />} />
         <Route path="/jobs" element={<JobList />} />
+        <Route path="/hotel-login" element={<HotelLogin />} />
+        <Route path="/hotel/register" element={<HotelRegistration />} />
+        <Route path="/jobseeker/register" element={<Register />} />
+        <Route path="/jobseeker/login" element={<Login />} />
+        <Route path="/ethics-training" element={<EthicsAndTraining />} />
+        <Route path="/jobseeker/my-applications" element={<MyApplications />} />
 
-
-        {/* User Dashboard */}
+        {/* Protected User Routes */}
         <Route
           path="/dashboard"
           element={
-            isLoggedIn ? (
-              isProfileComplete ? <UserDashboard /> : <Navigate to="/upload-profile" />
+            localStorage.getItem("token") ? (
+              <UserDashboard />
             ) : (
-              <Navigate to="/login" />
+              <Navigate to="/jobseeker/login" replace />
             )
+          }
+        />
+        <Route
+          path="/upload-profile"
+          element={
+            <ProtectedRoute>
+              <UploadProfile />
+            </ProtectedRoute>
           }
         />
 
@@ -72,46 +95,45 @@ function App() {
         <Route
           path="/admin/dashboard"
           element={
-            isAdminLoggedIn ? <AdminDashboard /> : <Navigate to="/admin/login" replace />
+            adminToken ? <AdminDashboard /> : <Navigate to="/admin/login" replace />
           }
         />
         <Route
           path="/admin/view-complaints"
           element={
-            isAdminLoggedIn ? <ViewComplaints /> : <Navigate to="/admin/login" replace />
+            adminToken ? <ViewComplaints /> : <Navigate to="/admin/login" replace />
           }
         />
         <Route
           path="/admin/manage-jobs"
           element={
-            isAdminLoggedIn ? <ManageJobs /> : <Navigate to="/admin/login" replace />
+            adminToken ? <ManageJobs /> : <Navigate to="/admin/login" replace />
           }
         />
         <Route
           path="/admin/profile"
           element={
-            isAdminLoggedIn ? <AdminProfile /> : <Navigate to="/admin/login" replace />
+            adminToken ? <AdminProfile /> : <Navigate to="/admin/login" replace />
           }
         />
 
-        {/* Hotel Routes */}
-        <Route path="/hotel-register" element={<HotelRegistration />} />
+        {/* Hotel Routes - Protected by login */}
         <Route
           path="/hotel-dashboard"
           element={
-            isHotelLoggedIn ? <HotelDashboard /> : <Navigate to="/hotel-register" />
+            hotelLoggedIn ? <HotelDashboard /> : <Navigate to="/hotel-login" replace />
           }
         />
         <Route
           path="/hotel-dashboard/post-job"
           element={
-            isHotelLoggedIn ? <PostJob /> : <Navigate to="/hotel-register" />
+            hotelLoggedIn ? <PostJob /> : <Navigate to="/hotel-login" replace />
           }
         />
         <Route
           path="/hotel-dashboard/view-applications"
           element={
-            isHotelLoggedIn ? <ViewApplications /> : <Navigate to="/hotel-register" />
+            hotelLoggedIn ? <ViewApplications /> : <Navigate to="/hotel-login" replace />
           }
         />
       </Routes>

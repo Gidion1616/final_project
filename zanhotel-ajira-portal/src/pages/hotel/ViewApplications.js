@@ -1,118 +1,228 @@
 import React, { useEffect, useState } from "react";
 
+const BASE_URL = "http://localhost:8000";
+
 const ViewApplications = () => {
   const [applications, setApplications] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  const token = localStorage.getItem("token");
+
+  // ---------------- FETCH ----------------
+  const fetchApplications = async () => {
+    try {
+      const res = await fetch(
+        "http://localhost:8000/api/jobs/hotel-applications/",
+        {
+          headers: { Authorization: `Token ${token}` },
+        }
+      );
+
+      const data = await res.json();
+      setApplications(Array.isArray(data) ? data : []);
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    const hotelName = localStorage.getItem("hotelName");
-
-    const fetchApplications = async () => {
-      try {
-        const response = await fetch(
-          `http://localhost:8000/api/jobs/applications/?hotel=${hotelName}`
-        );
-        if (!response.ok) throw new Error("Failed to fetch applications.");
-        const data = await response.json();
-        setApplications(data);
-      } catch (error) {
-        console.error("Error fetching applications:", error);
-      }
-    };
-
     fetchApplications();
   }, []);
 
-  return (
-    <div style={styles.container}>
-      <h2>Applications Received</h2>
+  // ---------------- STATUS UPDATE ----------------
+  const updateStatus = async (id, status) => {
+    await fetch(
+      "http://localhost:8000/api/jobs/hotel-applications/",
+      {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Token ${token}`,
+        },
+        body: JSON.stringify({ id, status }),
+      }
+    );
 
-      {applications.length === 0 ? (
-        <p>No applications received yet.</p>
-      ) : (
-        <table style={styles.table}>
-          <thead>
-            <tr>
-              <th>Applicant Name</th>
-              <th>Email</th>
-              <th>Phone</th>
-              <th>Job Title</th>
-              <th>CV</th>
-              <th>Certificate</th>
-              <th>Photo</th>
+    fetchApplications();
+  };
+
+  // ---------------- DELETE ONE ----------------
+  const deleteOne = async (id) => {
+    if (!window.confirm("Delete this application?")) return;
+
+    await fetch(
+      `http://localhost:8000/api/jobs/hotel-applications/${id}/`,
+      {
+        method: "DELETE",
+        headers: { Authorization: `Token ${token}` },
+      }
+    );
+
+    setApplications((prev) => prev.filter((a) => a.id !== id));
+  };
+
+  // ---------------- CLEAR ALL ----------------
+  const clearAll = async () => {
+    if (!window.confirm("Delete ALL applications?")) return;
+
+    await fetch(
+      "http://localhost:8000/api/jobs/hotel-applications/clear-all/",
+      {
+        method: "DELETE",
+        headers: { Authorization: `Token ${token}` },
+      }
+    );
+
+    setApplications([]);
+  };
+
+  if (loading) return <p>Loading...</p>;
+
+  return (
+    <div style={{ padding: 20 }}>
+      <h2>Hotel Applications</h2>
+
+      {/* CLEAR ALL */}
+      <button
+        onClick={clearAll}
+        style={{
+          background: "black",
+          color: "white",
+          padding: 10,
+          marginBottom: 15,
+        }}
+      >
+        Clear All Applications
+      </button>
+
+      <table border="1" width="100%" cellPadding="10">
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Email</th>
+            <th>Phone</th>
+            <th>Address</th>
+            <th>Photo</th>
+            <th>CV</th>
+            <th>Certificate</th>
+            <th>Position</th>
+            <th>Status</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          {applications.map((a) => (
+            <tr key={a.id}>
+              <td>{a.applicant_name}</td>
+              <td>{a.email}</td>
+              <td>{a.phone}</td>
+              <td>{a.address}</td>
+
+              {/* PHOTO PREVIEW */}
+              <td>
+                {a.photo ? (
+                  <a
+                    href={`${BASE_URL}${a.photo}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    <img
+                      src={`${BASE_URL}${a.photo}`}
+                      alt="Applicant"
+                      width="40"
+                      height="40"
+                      style={{
+                        borderRadius: "50%",
+                        cursor: "pointer",
+                        objectFit: "cover",
+                      }}
+                    />
+                  </a>
+                ) : (
+                  "N/A"
+                )}
+              </td>
+
+              {/* CV */}
+              <td>
+                {a.cv ? (
+                  <>
+                    <a
+                      href={`${BASE_URL}${a.cv}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      Preview
+                    </a>
+                    {" | "}
+                    <a
+                      href={`${BASE_URL}${a.cv}`}
+                      download
+                    >
+                      Download
+                    </a>
+                  </>
+                ) : (
+                  "N/A"
+                )}
+              </td>
+
+              {/* CERTIFICATES */}
+              <td>
+                {a.certificate ? (
+                  <>
+                    <a
+                      href={`${BASE_URL}${a.certificate}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      Preview
+                    </a>
+                    {" | "}
+                    <a
+                      href={`${BASE_URL}${a.certificate}`}
+                      download
+                    >
+                      Download
+                    </a>
+                  </>
+                ) : (
+                  "N/A"
+                )}
+              </td>
+
+              <td>{a.position}</td>
+
+              {/* STATUS */}
+              <td>
+                <select
+                  value={a.status}
+                  onChange={(e) => updateStatus(a.id, e.target.value)}
+                >
+                  <option>Pending</option>
+                  <option>Accepted</option>
+                  <option>Rejected</option>
+                </select>
+              </td>
+
+              {/* ACTION */}
+              <td>
+                <button
+                  onClick={() => deleteOne(a.id)}
+                  style={{ background: "red", color: "white" }}
+                >
+                  Delete
+                </button>
+              </td>
             </tr>
-          </thead>
-          <tbody>
-            {applications.map((app, index) => (
-              <tr key={index}>
-                <td>{app.applicant_name}</td>
-                <td>{app.email}</td>
-                <td>{app.phone}</td>
-                <td>{app.job_title}</td>
-                <td>
-                  {app.cv ? (
-                    <a href={app.cv} download target="_blank" rel="noopener noreferrer">
-                      Download CV
-                    </a>
-                  ) : (
-                    "N/A"
-                  )}
-                </td>
-                <td>
-                  {app.certificate ? (
-                    <a href={app.certificate} download target="_blank" rel="noopener noreferrer">
-                      Download Certificate
-                    </a>
-                  ) : (
-                    "N/A"
-                  )}
-                </td>
-                <td>
-                  {app.photo ? (
-                    <a href={app.photo} download target="_blank" rel="noopener noreferrer">
-                      <img
-                        src={app.photo}
-                        alt="Applicant"
-                        style={{ width: "40px", height: "40px", borderRadius: "50%" }}
-                      />
-                    </a>
-                  ) : (
-                    "N/A"
-                  )}
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      )}
+          ))}
+        </tbody>
+      </table>
     </div>
   );
-};
-
-const styles = {
-  container: {
-    backgroundColor: "#fff",
-    padding: "30px",
-    borderRadius: "10px",
-    maxWidth: "1000px",
-    margin: "auto",
-    boxShadow: "0 0 10px rgba(0,0,0,0.1)",
-  },
-  table: {
-    width: "100%",
-    borderCollapse: "collapse",
-    marginTop: "20px",
-  },
-  th: {
-    backgroundColor: "#123c7a",
-    color: "#fff",
-    padding: "10px",
-    border: "1px solid #ddd",
-  },
-  td: {
-    padding: "10px",
-    border: "1px solid #ddd",
-    textAlign: "center",
-  },
 };
 
 export default ViewApplications;

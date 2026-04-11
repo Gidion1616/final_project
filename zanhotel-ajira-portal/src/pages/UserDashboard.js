@@ -30,7 +30,7 @@ const UserDashboard = () => {
   const handleLogout = () => {
     localStorage.removeItem("token");
     localStorage.removeItem("isProfileComplete");
-    window.location.href = "/login";
+    window.location.href = "/";
   };
 
   return (
