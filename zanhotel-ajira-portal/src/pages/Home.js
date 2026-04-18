@@ -5,17 +5,16 @@ import { useNavigate } from "react-router-dom";
 const Home = () => {
   const navigate = useNavigate();
   
-  // Local background images from public folder
   const backgrounds = [
     "url('/ht1.jpg')",
     "url('/ht2.jpg')",
-    "url('/ht3.jpg')",
-    "url('/ht4.jpg')",
-    "url('/ht5.jpg')",
-    "url('/ht6.jpg')"
+    "url('/sun.png')",
+    "url('/ht44.png')",
+    "url('/nn.png')",
+    "url('/ht33.png')",
+    "url('/ht55.png')",
   ];
 
-  // Enhanced transition effect
   useEffect(() => {
     let current = 0;
     const bgElement = document.querySelector(".bg-container");
@@ -30,12 +29,10 @@ const Home = () => {
     return () => clearInterval(bgInterval);
   }, []);
 
-  // Handle CTA button click
   const handleGetStarted = () => {
     navigate("/select-user");
   };
 
-  // Inline CSS with enhanced effects
   const styles = {
     homeContainer: {
       position: "relative",
@@ -93,7 +90,7 @@ const Home = () => {
     },
     featureCard: {
       background: "rgba(255,255,255,0.15)",
-      backdropFilter: "blur(10px)",
+      backdropFilter: "blur(0px)",
       padding: "1.5rem",
       borderRadius: "15px",
       border: "1px solid rgba(255,255,255,0.2)",
@@ -130,17 +127,16 @@ const Home = () => {
     },
   };
 
-  // Reduced to 3 features
   const features = [
     {
       icon: "🚀",
-      title: "Blazing Fast",
+      title: "Fast Performance",
       desc: "Optimized for instant loading"
     },
     {
       icon: "✨",
       title: "Modern Design",
-      desc: "Sleek and intuitive interface"
+      desc: "Clean and intuitive interface"
     },
     {
       icon: "🛡️",
@@ -151,10 +147,8 @@ const Home = () => {
 
   return (
     <div style={styles.homeContainer}>
-      {/* Full-screen background ending at footer */}
       <div className="bg-container" style={styles.bgContainer}></div>
       
-      {/* Content overlay */}
       <div style={styles.contentWrapper}>
         <motion.div 
           initial={{ opacity: 0 }}
@@ -167,7 +161,7 @@ const Home = () => {
             transition={{ duration: 0.8, type: "spring" }}
             style={styles.mainTitle}
           >
-            Karibu ZanHotel-Ajira Portal
+            Welcome to ZanHotel-Ajira Portal
           </motion.h1>
 
           <motion.p
@@ -175,11 +169,9 @@ const Home = () => {
             transition={{ delay: 0.4, duration: 0.8 }}
             style={styles.subtitle}
           >
-            Pata fursa za ajira katika hoteli mbalimbali za Zanzibar. Unganisha na
-            waajiri na fursa za mafunzo kwa urahisi.
+            Find job opportunities in various hotels in Zanzibar. Connect with employers and training opportunities easily.
           </motion.p>
 
-          {/* Features Grid */}
           <div style={styles.featuresGrid}>
             {features.map((feature, i) => (
               <motion.div
@@ -194,13 +186,16 @@ const Home = () => {
                 style={styles.featureCard}
               >
                 <div style={styles.featureIcon}>{feature.icon}</div>
-                <h3 style={{ marginBottom: "0.8rem", fontSize: "1.2rem" }}>{feature.title}</h3>
-                <p style={{ opacity: 0.9, fontSize: "0.9rem" }}>{feature.desc}</p>
+                <h3 style={{ marginBottom: "0.8rem", fontSize: "1.2rem" }}>
+                  {feature.title}
+                </h3>
+                <p style={{ opacity: 0.9, fontSize: "0.9rem" }}>
+                  {feature.desc}
+                </p>
               </motion.div>
             ))}
           </div>
 
-          {/* CTA Button */}
           <motion.button
             whileHover={{ 
               scale: 1.05,
@@ -210,12 +205,11 @@ const Home = () => {
             style={styles.ctaButton}
             onClick={handleGetStarted}
           >
-            Anza Sasa
+            Get Started
           </motion.button>
         </motion.div>
       </div>
 
-      {/* Footer */}
       <footer style={styles.footer}>
         <p>&copy; {new Date().getFullYear()} ZanHotel-Ajira Portal</p>
       </footer>

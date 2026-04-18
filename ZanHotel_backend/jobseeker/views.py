@@ -111,3 +111,16 @@ def me(request):
         "photo": user.photo.url if user.photo else None,
         "certificate": user.certificate.url if user.certificate else None,
     })
+
+
+
+
+@api_view(["GET"])
+@permission_classes([IsAuthenticated])
+def current_user(request):
+    user = request.user
+
+    return Response({
+        "full_name": getattr(user, "full_name", user.full_name),
+        "email": user.email
+    })

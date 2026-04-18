@@ -13,7 +13,7 @@ class JobApplicationSerializer(serializers.ModelSerializer):
     address = serializers.CharField(source="jobseeker.address", read_only=True)
     photo = serializers.ImageField(source="jobseeker.photo", read_only=True)
     cv = serializers.FileField(source="jobseeker.cv", read_only=True)
-    certificates = serializers.FileField(source="jobseeker.certificates", read_only=True)
+    certificate = serializers.FileField(source="jobseeker.certificate", read_only=True)
 
 
 
@@ -34,7 +34,7 @@ class JobApplicationSerializer(serializers.ModelSerializer):
             "address",
             "photo",
             "cv",
-            "certificates",
+            "certificate",
             
         ]
         read_only_fields = ["jobseeker", "status", "applied_at"]
