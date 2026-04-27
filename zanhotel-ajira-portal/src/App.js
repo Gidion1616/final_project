@@ -16,11 +16,11 @@ import MyApplications from "./pages/MyApplications";
 import JobList from "./pages/JobList";
 import UserDashboard from "./pages/UserDashboard";
 
-import AdminLogin from "./pages/AdminLogin";
-import AdminDashboard from "./pages/AdminDashboard";
+import AdminLogin from "./pages/admin/AdminLogin";
+import AdminDashboard from "./pages/admin/AdminDashboard";
 import ViewComplaints from "./pages/ViewComplaints";
-import ManageJobs from "./pages/ManageJobs";
-import AdminProfile from "./pages/AdminProfile";
+import ManageJobs from "./pages/admin/ManageJobs";
+// import AdminProfile from "./pages/AdminProfile";
 
 import HotelRegistration from "./pages/HotelRegistration";
 import HotelDashboard from "./pages/HotelDashboard";
@@ -110,12 +110,12 @@ function App() {
             adminToken ? <ManageJobs /> : <Navigate to="/admin/login" replace />
           }
         />
-        <Route
+        {/* <Route
           path="/admin/profile"
           element={
             adminToken ? <AdminProfile /> : <Navigate to="/admin/login" replace />
           }
-        />
+        /> */}
 
         {/* Hotel Routes - Protected by login */}
         <Route
