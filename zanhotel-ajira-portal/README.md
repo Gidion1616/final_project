@@ -1,70 +1,56 @@
-# Getting Started with Create React App
+# ZANHOTEL-AJIRA-PORTAL
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+A full-stack recruitment portal for Zanzibar's hospitality sector. It supports three roles—Job Seeker, Hotel, and Ministry Admin—with approval-gated hotel access and profile-based applications.
 
-## Available Scripts
+## Technology
 
-In the project directory, you can run:
+- React 18 + Vite frontend
+- Django 5 backend and SQLite database
+- Token authentication and role-based API authorization
+- Local media storage for photos, certificates, CVs, licenses, and hotel images
+- OpenStreetMap embeds for hotel locations
 
-### `npm start`
+## Setup
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+Requirements: Node.js 20+, Python 3.11+.
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+### Backend
 
-### `npm test`
+```bash
+cd backend
+python -m venv .venv
+# Windows
+.venv\Scripts\activate
+pip install -r requirements.txt
+python manage.py makemigrations portal
+python manage.py migrate
+python manage.py createsuperuser
+python manage.py runserver
+```
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+The superuser can sign in through the portal's normal `/login` page and is directed to the Ministry dashboard. Django's built-in administration remains available at `/django-admin/`.
 
-### `npm run build`
+### Frontend
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+In a second terminal from the repository root:
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+```bash
+npm install
+npm run dev
+```
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+Open `http://localhost:3000`. Vite proxies `/api` and `/media` to Django at `http://localhost:8000`.
 
-### `npm run eject`
+For a separately hosted API, copy `.env.example` to `.env` and set `VITE_API_URL` to its full API URL.
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+## Main flows
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+- Public visitors browse and filter vacancies. Home only displays jobs posted within the configured five-day window.
+- Visitors who apply are sent to registration/login. Job seekers apply using their saved profile and documents.
+- Self-registered hotels cannot sign in until approved on the Ministry Admin dashboard.
+- Hotels post/edit/delete jobs, view application counts, see the most popular vacancy, inspect applicant documents, and provide a status and feedback.
+- Admins approve hotels, control user/job visibility, see system totals, and change portal settings.
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+## Production notes
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
-
-### Code Splitting
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
-
-### Analyzing the Bundle Size
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+Before deployment, set `DEBUG=False`, move `SECRET_KEY` to an environment variable, configure production hosts/CORS, use PostgreSQL, and store uploaded media in private object storage. Uploaded identity and credential documents should not be exposed through a public media server in production.
