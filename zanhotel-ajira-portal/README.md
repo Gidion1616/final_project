@@ -30,6 +30,25 @@ python manage.py runserver
 
 The superuser can sign in through the portal's normal `/login` page and is directed to the Ministry dashboard. Django's built-in administration remains available at `/django-admin/`.
 
+### Email notifications
+
+During local development, notification emails are printed in the Django terminal. The portal sends notifications after registration, when a hotel posts a job, when an application receives a response, and when maintenance status changes.
+
+To send real email through an SMTP provider, set these variables before `runserver` (use an SMTP/app password, not your normal mailbox password):
+
+```powershell
+$env:EMAIL_BACKEND="django.core.mail.backends.smtp.EmailBackend"
+$env:EMAIL_HOST="smtp.gmail.com"
+$env:EMAIL_PORT="587"
+$env:EMAIL_HOST_USER="your-address@gmail.com"
+$env:EMAIL_HOST_PASSWORD="your-app-password"
+$env:EMAIL_USE_TLS="True"
+$env:DEFAULT_FROM_EMAIL="ZanHotel Ajira Portal <your-address@gmail.com>"
+python manage.py runserver
+```
+
+For another provider, replace the SMTP host, port, and credentials with those supplied by that provider.
+
 ### Frontend
 
 In a second terminal from the repository root:
