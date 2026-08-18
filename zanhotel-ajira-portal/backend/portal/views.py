@@ -1,9 +1,9 @@
 import json
-from datetime import timedelta
+from datetime import date, timedelta
 from django.contrib.auth import authenticate
 from django.core.exceptions import ValidationError
 from django.core.validators import validate_email
-from django.db.models import Count
+from django.db.models import Count, Max, Min, Q
 from django.conf import settings
 from django.contrib.auth.tokens import default_token_generator
 from django.utils.encoding import force_bytes, force_str
@@ -89,6 +89,7 @@ def user_data(request, u, private=False):
                 "image": url(request, h.image),
                 "business_license": url(request, h.business_license),
                 "approved": h.approved,
+                "star_rating": h.star_rating,
             }
     return d
 
@@ -113,6 +114,7 @@ def job_data(request, j, detail=False):
             "location": j.hotel.location,
             "latitude": j.hotel.latitude,
             "longitude": j.hotel.longitude,
+            "star_rating": j.hotel.star_rating,
         },
     }
     if detail:
@@ -207,6 +209,27 @@ def register_jobseeker(request):
         )
     if d["password"] != d["confirm_password"]:
         return JsonResponse({"detail": "Passwords do not match."}, status=400)
+
+    # MINIMUM WORKING AGE / UMRI WA CHINI WA KUFANYA KAZI
+    # EN: The date is parsed on the server because browser validation can be bypassed.
+    # SW: Tarehe hukaguliwa backend kwa sababu validation ya browser inaweza kurukwa.
+    # EN: A person is eligible on the exact calendar day of their 19th birthday.
+    # SW: Mwombaji anaruhusiwa kuanzia siku kamili anapotimiza miaka 19.
+    # EN/SW: Invalid and under-age dates stop registration before any files are saved.
+    try:
+        birth_date = date.fromisoformat(d["date_of_birth"])
+        today = timezone.localdate()
+        try:
+            latest_allowed_birth_date = today.replace(year=today.year - 19)
+        except ValueError:
+            latest_allowed_birth_date = today.replace(year=today.year - 19, day=28)
+    except ValueError:
+        return JsonResponse({"detail": "Enter a valid date of birth."}, status=400)
+    if birth_date > latest_allowed_birth_date:
+        return JsonResponse(
+            {"detail": "You must be at least 19 years old to register."},
+            status=400,
+        )
     if User.objects.filter(username__iexact=d["username"]).exists():
         return JsonResponse({"detail": "Username already exists."}, status=400)
     try:
@@ -647,11 +670,26 @@ def hotel_overview(request):
         application_count=Count("applications")
     )
     top = max([j.application_count for j in jobs] or [0])
+    departments = list(
+        Job.objects.filter(hotel=u.hotel)
+        .values("category")
+        .annotate(
+            job_count=Count("id", distinct=True),
+            application_count=Count("applications"),
+            accepted_count=Count(
+                "applications",
+                filter=Q(applications__status="accepted"),
+            ),
+        )
+        .order_by("-accepted_count", "-job_count", "category")
+    )
     return JsonResponse(
         {
             "hotel": {"name": u.hotel.name, "approved": u.hotel.approved},
             "total_jobs": jobs.count(),
             "total_applications": sum(j.application_count for j in jobs),
+            "departments": departments,
+            "top_department": departments[0] if departments else None,
             "jobs": [
                 job_data(request, j)
                 | {"highest": j.application_count == top and top > 0}
@@ -782,6 +820,42 @@ def admin_overview(request):
     u = auth(request, ["admin"])
     if not u:
         return denied()
+    departments = list(
+        Job.objects.values("category")
+        .annotate(
+            job_count=Count("id", distinct=True),
+            application_count=Count("applications"),
+            accepted_count=Count(
+                "applications",
+                filter=Q(applications__status="accepted"),
+            ),
+        )
+        .order_by("-accepted_count", "-job_count", "category")
+    )
+    hotel_activity = list(
+        Hotel.objects.values("id", "name")
+        .annotate(
+            job_count=Count("jobs", distinct=True),
+            application_count=Count("jobs__applications"),
+            accepted_count=Count(
+                "jobs__applications",
+                filter=Q(jobs__applications__status="accepted"),
+            ),
+        )
+        .order_by("-accepted_count", "-job_count", "name")
+    )
+    positions = list(
+        Job.objects.values("position")
+        .annotate(
+            job_count=Count("id", distinct=True),
+            application_count=Count("applications"),
+            accepted_count=Count(
+                "applications",
+                filter=Q(applications__status="accepted"),
+            ),
+        )
+        .order_by("-accepted_count", "-job_count", "position")
+    )
     return JsonResponse(
         {
             "stats": {
@@ -791,6 +865,11 @@ def admin_overview(request):
                 "jobs": Job.objects.count(),
                 "applications": Application.objects.count(),
             },
+            "departments": departments,
+            "hotel_activity": hotel_activity,
+            "positions": positions,
+            "top_department": departments[0] if departments else None,
+            "top_hotel": hotel_activity[0] if hotel_activity else None,
             "hotels": [
                 {
                     "id": h.id,
@@ -816,6 +895,88 @@ def admin_overview(request):
     )
 
 
+def admin_report_data(request):
+    """Returns a detailed, highest-to-lowest top-20 hotel hiring ranking."""
+    u = auth(request, ["admin"])
+    if not u:
+        return denied()
+
+    # MINISTRY HIRING FREQUENCY / MARUDIO YA UAJIRI KWA WIZARA
+    # EN: Hotels are ranked by vacancies posted, which is the clearest repeat-hiring signal.
+    # SW: Hoteli hupangwa kwa ajira zilizotangazwa, kipimo cha wazi cha kuajiri mara kwa mara.
+    # EN: Accepted applicants break ties, and only the first twenty records are returned.
+    # SW: Waliokubaliwa hutenganisha sare, na hoteli ishirini za kwanza pekee hurudishwa.
+    # EN/SW: Dates and jobs-per-month explain the activity behind each ranking position.
+    ranked_hotels = list(
+        Hotel.objects.values(
+            "id",
+            "name",
+            "location",
+            "registration_number",
+            "approved",
+        )
+        .annotate(
+            job_count=Count("jobs", distinct=True),
+            active_job_count=Count("jobs", filter=Q(jobs__active=True), distinct=True),
+            application_count=Count("jobs__applications"),
+            accepted_count=Count(
+                "jobs__applications",
+                filter=Q(jobs__applications__status="accepted"),
+            ),
+            first_job_date=Min("jobs__created_at"),
+            latest_job_date=Max("jobs__created_at"),
+        )
+        .order_by("-job_count", "-accepted_count", "name")[:20]
+    )
+    for rank, hotel in enumerate(ranked_hotels, 1):
+        departments = list(
+            Job.objects.filter(hotel_id=hotel["id"])
+            .values("category")
+            .annotate(job_count=Count("id"))
+            .order_by("-job_count", "category")
+        )
+        positions = list(
+            Job.objects.filter(hotel_id=hotel["id"])
+            .values("position")
+            .annotate(job_count=Count("id"))
+            .order_by("-job_count", "position")
+        )
+        first_date = hotel["first_job_date"]
+        latest_date = hotel["latest_job_date"]
+        active_months = max(((latest_date - first_date).days / 30.44) + 1, 1) if first_date else 1
+        hotel.update(
+            {
+                "rank": rank,
+                "jobs_per_month": round(hotel["job_count"] / active_months, 2),
+                "top_department": departments[0]["category"] if departments else "No jobs",
+                "top_position": positions[0]["position"] if positions else "No jobs",
+                "departments": departments,
+                "positions": positions,
+            }
+        )
+    return JsonResponse({"results": ranked_hotels, "limit": 20})
+
+
+def hotel_report(request):
+    """Creates a PDF summary restricted to the authenticated hotel's own records."""
+    u = auth(request, ["hotel"])
+    if not u:
+        return denied()
+    from .services.report_service import create_hotel_report
+
+    return create_hotel_report(u.hotel)
+
+
+def admin_report(request):
+    """Creates the Ministry-wide PDF recruitment and hotel activity report."""
+    u = auth(request, ["admin"])
+    if not u:
+        return denied()
+    from .services.report_service import create_ministry_report
+
+    return create_ministry_report()
+
+
 @csrf_exempt
 def approve_hotel(request, pk):
     """Admin huidhinisha au kuondoa idhini ya akaunti ya hoteli."""
@@ -830,6 +991,74 @@ def approve_hotel(request, pk):
     if previous_approval != h.approved:
         send_hotel_approval_email(h, h.approved)
     return JsonResponse({"approved": h.approved})
+
+
+def admin_hotel_detail(request, pk):
+    """Returns every hotel registration field required for Ministry verification."""
+    u = auth(request, ["admin"])
+    if not u:
+        return denied()
+    hotel = get_object_or_404(Hotel.objects.select_related("user"), pk=pk)
+
+    # COMPLETE HOTEL VERIFICATION / UHAKIKI KAMILI WA HOTELI
+    # EN: Only Ministry administrators can open this private registration record.
+    # SW: Wasimamizi wa Wizara pekee wanaweza kufungua taarifa hizi za usajili.
+    # EN: Account, contact, registration, document, map and activity data are combined.
+    # SW: Akaunti, mawasiliano, usajili, nyaraka, ramani na shughuli huunganishwa.
+    # EN/SW: The response lets the Ministry inspect evidence before changing approval.
+    data = user_data(request, hotel.user, True)
+    data.update(
+        {
+            "date_joined": hotel.user.date_joined,
+            "last_login": hotel.user.last_login,
+        }
+    )
+    data["hotel"].update(
+        {
+            "id": hotel.id,
+            "created_at": hotel.created_at,
+            "total_jobs": hotel.jobs.count(),
+            "active_jobs": hotel.jobs.filter(active=True).count(),
+            "total_applications": Application.objects.filter(job__hotel=hotel).count(),
+            "accepted_applications": Application.objects.filter(
+                job__hotel=hotel,
+                status="accepted",
+            ).count(),
+        }
+    )
+    return JsonResponse(data)
+
+
+@csrf_exempt
+def classify_hotel(request, pk):
+    """Allows the Ministry to assign an official zero-to-five-star hotel status."""
+    u = auth(request, ["admin"])
+    if not u:
+        return denied()
+    if request.method != "POST":
+        return JsonResponse({"detail": "Method not allowed"}, status=405)
+
+    # OFFICIAL STAR SELECTION / UCHAGUZI RASMI WA NYOTA
+    # EN: The API accepts only whole numbers from zero through five.
+    # SW: API inakubali namba kamili kuanzia sifuri hadi tano pekee.
+    # EN: Zero removes a classification without deleting or disabling the hotel.
+    # SW: Sifuri huondoa daraja bila kufuta au kusimamisha akaunti ya hoteli.
+    # EN/SW: Public job responses immediately use the saved classification.
+    try:
+        star_rating = int(body(request).get("star_rating"))
+    except (TypeError, ValueError):
+        return JsonResponse({"detail": "Select a valid hotel star status."}, status=400)
+    if star_rating not in range(0, 6):
+        return JsonResponse({"detail": "Hotel status must be between 0 and 5 stars."}, status=400)
+    hotel = get_object_or_404(Hotel, pk=pk)
+    hotel.star_rating = star_rating
+    hotel.save(update_fields=["star_rating"])
+    return JsonResponse(
+        {
+            "detail": "Hotel star status updated successfully.",
+            "star_rating": hotel.star_rating,
+        }
+    )
 
 
 @csrf_exempt

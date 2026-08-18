@@ -32,4 +32,34 @@ export async function api(path, options = {}) {
     );
   return data;
 }
+
+/*
+ * AUTHENTICATED FILE DOWNLOAD / UPAKUAJI WA FAILI ULIOHIFADHIWA
+ * EN: Reports require a login token, which a normal anchor link cannot attach.
+ * SW: Ripoti zinahitaji token ya login ambayo link ya kawaida haiwezi kutuma.
+ * EN: This helper fetches the protected file, creates a temporary browser URL,
+ * SW: Helper hii huleta faili, hutengeneza URL ya muda ndani ya browser,
+ * EN/SW: then starts the download and immediately releases that temporary URL.
+ */
+export async function downloadFile(path, filename) {
+  const s = session.get();
+  const response = await fetch(`${BASE}${path}`, {
+    headers: s?.token ? { Authorization: `Token ${s.token}` } : {},
+  });
+  if (!response.ok) {
+    let message = "The report could not be downloaded.";
+    try {
+      message = (await response.json()).detail || message;
+    } catch {}
+    throw new Error(message);
+  }
+  const objectUrl = URL.createObjectURL(await response.blob());
+  const link = document.createElement("a");
+  link.href = objectUrl;
+  link.download = filename;
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+  URL.revokeObjectURL(objectUrl);
+}
 export const money = (n) => new Intl.NumberFormat("en-TZ").format(n || 0);

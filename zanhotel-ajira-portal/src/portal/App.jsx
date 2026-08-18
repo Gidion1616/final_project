@@ -14,6 +14,7 @@ import {
   FiCheckCircle,
   FiClock,
   FiFileText,
+  FiDownload,
   FiFilter,
   FiHash,
   FiHome,
@@ -27,6 +28,7 @@ import {
   FiSearch,
   FiSettings,
   FiShield,
+  FiStar,
   FiUser,
   FiUsers,
   FiX,
@@ -39,7 +41,7 @@ import {
   FaTwitter,
   FaYoutube,
 } from "react-icons/fa";
-import { api, session } from "./api";
+import { api, downloadFile, session } from "./api";
 
 /*
  * MWONGOZO WA FUNCTION ZA FRONTEND
@@ -101,6 +103,30 @@ function Notice({ error, children }) {
 // Hubadilisha thamani ya status kuwa badge yenye rangi inayofaa.
 function Status({ value }) {
   return <span className={`status ${value}`}>{value}</span>;
+}
+
+/*
+ * HOTEL STAR DISPLAY / MUONEKANO WA NYOTA ZA HOTELI
+ * EN: The component converts the Ministry's numeric classification into gold stars.
+ * SW: Component hubadilisha daraja la namba la Wizara kuwa nyota za dhahabu.
+ * EN: It is reusable so cards, descriptions and verification show identical ratings.
+ * SW: Inatumika sehemu nyingi ili kadi, maelezo na uhakiki vionyeshe sawa.
+ * EN/SW: A zero value clearly identifies a hotel that is not classified yet.
+ */
+function HotelStars({ rating = 0 }) {
+  const stars = Number(rating) || 0;
+  if (!stars)
+    return <span className="hotel-unclassified">Not yet star classified</span>;
+  return (
+    <span className="hotel-stars" aria-label={`${stars}-star hotel`}>
+      <span>
+        {Array.from({ length: stars }, (_, index) => (
+          <FiStar key={index} />
+        ))}
+      </span>
+      <small>{stars}-star hotel</small>
+    </span>
+  );
 }
 // Huonyesha nembo; inverse hutumika kwenye background yenye rangi nzito.
 function Logo({ inverse = false }) {
@@ -207,6 +233,7 @@ function Layout({ children }) {
 function JobCard({ job }) {
   const s = session.get();
   const nav = useNavigate();
+  const [showInfo, setShowInfo] = useState(false);
   const apply = () =>
     nav(
       s?.user?.role === "jobseeker"
@@ -226,6 +253,7 @@ function JobCard({ job }) {
         </div>
         <h3>{job.title}</h3>
         <p className="company">{job.hotel.name}</p>
+        <HotelStars rating={job.hotel.star_rating} />
         <div className="meta">
           <span>
             <FiMapPin />
@@ -247,7 +275,50 @@ function JobCard({ job }) {
         <button className="btn" onClick={apply}>
           View & apply <FiArrowRight />
         </button>
+        <button
+          type="button"
+          className={`more-info ${showInfo ? "active" : ""}`}
+          onClick={() => setShowInfo((visible) => !visible)}
+          aria-expanded={showInfo}
+        >
+          <FiStar /> {showInfo ? "Hide details" : "More info"}
+        </button>
       </div>
+      {showInfo && (
+        <div className="job-extra">
+          <div>
+            <strong>Detailed hotel location</strong>
+            <span>{job.hotel.location}</span>
+          </div>
+          <div>
+            <strong>Experience required</strong>
+            <span>{job.experience}</span>
+          </div>
+          <div>
+            <strong>Gender required</strong>
+            <span>{job.gender}</span>
+          </div>
+          <div>
+            <strong>Position / department</strong>
+            <span>
+              {job.position} / {job.category}
+            </span>
+          </div>
+          <div>
+            <strong>Hotel star status</strong>
+            <HotelStars rating={job.hotel.star_rating} />
+          </div>
+          {job.hotel.latitude && job.hotel.longitude && (
+            <a
+              href={`https://www.google.com/maps/dir/?api=1&destination=${job.hotel.latitude},${job.hotel.longitude}`}
+              target="_blank"
+              rel="noreferrer"
+            >
+              <FiMapPin /> Open location and directions
+            </a>
+          )}
+        </div>
+      )}
     </article>
   );
 }
@@ -470,6 +541,7 @@ function JobDetail() {
             <span className="pill">{data.category}</span>
             <h1>{data.title}</h1>
             <h3>{data.hotel.name}</h3>
+            <HotelStars rating={data.hotel.star_rating} />
             <div className="meta">
               <span>
                 <FiMapPin />
@@ -500,23 +572,131 @@ function JobDetail() {
             <hr />
             <small>Application deadline</small>
             <strong>{new Date(data.deadline).toLocaleDateString()}</strong>
-            {data.hotel.latitude && (
-              <iframe
-                title="Hotel location"
-                src={`https://www.openstreetmap.org/export/embed.html?bbox=${Number(data.hotel.longitude) - 0.02},${Number(data.hotel.latitude) - 0.02},${Number(data.hotel.longitude) + 0.02},${Number(data.hotel.latitude) + 0.02}&marker=${data.hotel.latitude},${data.hotel.longitude}`}
-              />
-            )}
-            <a
-              target="_blank"
-              rel="noreferrer"
-              href={`https://www.openstreetmap.org/search?query=${encodeURIComponent(data.hotel.location)}`}
-            >
-              View location on map
-            </a>
+            <HotelDirections hotel={data.hotel} />
           </aside>
         </div>
       </section>
     </Layout>
+  );
+}
+
+/*
+ * LIVE DIRECTIONS / MAELEKEZO YA MOJA KWA MOJA
+ * EN: The browser asks permission to read the visitor's current GPS coordinates.
+ * SW: Browser huomba ruhusa ya kusoma coordinate za GPS za alipo mtumiaji.
+ * EN: When permission is granted, the embedded map shows a route to the hotel.
+ * SW: Ruhusa ikitolewa, ramani inaonyesha njia kutoka alipo hadi kwenye hoteli.
+ * EN: The distance shown is a straight-line estimate, while Google provides road directions.
+ * SW: Umbali ni makadirio ya mstari; Google hutoa njia halisi ya barabarani.
+ * EN: Without permission, the hotel map still works and Google chooses the starting point.
+ * SW: Bila ruhusa, ramani ya hoteli hubaki na Google humruhusu kuchagua pa kuanzia.
+ */
+function HotelDirections({ hotel }) {
+  const [current, setCurrent] = useState(null);
+  const [locationMessage, setLocationMessage] = useState("");
+  const hotelLatitude = Number(hotel.latitude);
+  const hotelLongitude = Number(hotel.longitude);
+
+  function findMyLocation() {
+    if (!navigator.geolocation) {
+      setLocationMessage("Location is not supported by this browser.");
+      return;
+    }
+    setLocationMessage("Finding your current location...");
+    navigator.geolocation.getCurrentPosition(
+      ({ coords }) => {
+        setCurrent({ latitude: coords.latitude, longitude: coords.longitude });
+        setLocationMessage("Your current location was found.");
+      },
+      (error) => {
+        const messages = {
+          1: "Location permission was denied. Allow location access and try again.",
+          2: "Your current location could not be determined.",
+          3: "Finding your location took too long. Please try again.",
+        };
+        setLocationMessage(
+          messages[error.code] || "Unable to find your location.",
+        );
+      },
+      { enableHighAccuracy: true, timeout: 15000, maximumAge: 60000 },
+    );
+  }
+
+  function distanceInKilometres() {
+    if (!current) return null;
+    const toRadians = (degrees) => (degrees * Math.PI) / 180;
+    const earthRadius = 6371;
+    const latitudeDifference = toRadians(hotelLatitude - current.latitude);
+    const longitudeDifference = toRadians(hotelLongitude - current.longitude);
+    const value =
+      Math.sin(latitudeDifference / 2) ** 2 +
+      Math.cos(toRadians(current.latitude)) *
+        Math.cos(toRadians(hotelLatitude)) *
+        Math.sin(longitudeDifference / 2) ** 2;
+    return (
+      earthRadius *
+      2 *
+      Math.atan2(Math.sqrt(value), Math.sqrt(1 - value))
+    ).toFixed(1);
+  }
+
+  if (!Number.isFinite(hotelLatitude) || !Number.isFinite(hotelLongitude)) {
+    return <Notice error="The hotel has not provided valid map coordinates." />;
+  }
+
+  const destination = `${hotelLatitude},${hotelLongitude}`;
+  const origin = current ? `${current.latitude},${current.longitude}` : "";
+  const directionsUrl = `https://www.google.com/maps/dir/?api=1${origin ? `&origin=${origin}` : ""}&destination=${destination}&travelmode=driving`;
+  const embeddedUrl = current
+    ? `https://www.google.com/maps?saddr=${origin}&daddr=${destination}&output=embed`
+    : `https://www.openstreetmap.org/export/embed.html?bbox=${hotelLongitude - 0.02},${hotelLatitude - 0.02},${hotelLongitude + 0.02},${hotelLatitude + 0.02}&marker=${destination}`;
+
+  return (
+    <div className="directions">
+      <h3>
+        <FiMapPin /> Directions to {hotel.name}
+      </h3>
+      <p>{hotel.location}</p>
+      <iframe
+        title={current ? "Route from your location to hotel" : "Hotel location"}
+        src={embeddedUrl}
+        allowFullScreen
+        loading="lazy"
+      />
+      {current && (
+        <div className="route-summary">
+          <span>
+            <strong>Your location</strong>
+            <small>
+              {current.latitude.toFixed(6)}, {current.longitude.toFixed(6)}
+            </small>
+          </span>
+          <FiArrowRight />
+          <span>
+            <strong>{hotel.name}</strong>
+            <small>{destination}</small>
+          </span>
+          <b>About {distanceInKilometres()} km away</b>
+        </div>
+      )}
+      {locationMessage && <p className="location-message">{locationMessage}</p>}
+      <div className="direction-actions">
+        <button type="button" className="btn ghost" onClick={findMyLocation}>
+          <FiMapPin /> Use my current location
+        </button>
+        <a
+          className="btn"
+          target="_blank"
+          rel="noopener noreferrer"
+          href={directionsUrl}
+        >
+          <FiArrowRight /> Start directions
+        </a>
+      </div>
+      <small>
+        For accurate directions, enable Location/GPS permission in your browser.
+      </small>
+    </div>
   );
 }
 /*
@@ -626,6 +806,9 @@ function FieldTitle({ icon: Icon, children }) {
 }
 // Fields zote binafsi na nyaraka zinazohitajika kwa Job Seeker.
 function JobseekerFields() {
+  const minimumAgeDate = new Date();
+  minimumAgeDate.setFullYear(minimumAgeDate.getFullYear() - 19);
+  const latestAllowedBirthDate = minimumAgeDate.toISOString().split("T")[0];
   return (
     <>
       <div className="two">
@@ -647,7 +830,15 @@ function JobseekerFields() {
         </label>
         <label>
           <FieldTitle icon={FaBirthdayCake}>Date of birth</FieldTitle>
-          <input type="date" name="date_of_birth" required />
+          <input
+            type="date"
+            name="date_of_birth"
+            max={latestAllowedBirthDate}
+            required
+          />
+          <small className="field-help">
+            You must be at least 19 years old.
+          </small>
         </label>
         <label>
           <FieldTitle icon={FaVenusMars}>Gender</FieldTitle>
@@ -951,6 +1142,7 @@ function DashLayout({ role, children }) {
             ["Hotels", FiBriefcase, "hotels"],
             ["Job seekers", FiUsers, "users"],
             ["Jobs", FiSearch, "jobs"],
+            ["Reports", FiFileText, "reports"],
             ["Home content", FiHome, "home"],
             ["Send email", FiMail, "email"],
             ["Settings", FiSettings, "settings"],
@@ -1481,6 +1673,16 @@ function HotelProfile() {
  */
 function HotelDash() {
   const { data } = useLoad("/hotel/overview/");
+  const [reportMessage, setReportMessage] = useState("");
+  async function downloadReport() {
+    try {
+      setReportMessage("Preparing report...");
+      await downloadFile("/hotel/report/", "hotel-recruitment-report.pdf");
+      setReportMessage("Report downloaded successfully.");
+    } catch (error) {
+      setReportMessage(error.message);
+    }
+  }
   return (
     <DashLayout role="hotel">
       <Title
@@ -1512,6 +1714,39 @@ function HotelDash() {
             </div>
           ))}
         </div>
+      </Panel>
+      <Panel title="Recruitment report">
+        <div className="report-heading">
+          <p>
+            Review hiring activity here or download the complete official PDF.
+          </p>
+          <button className="btn" onClick={downloadReport}>
+            <FiDownload /> Download PDF
+          </button>
+        </div>
+        <div className="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Department</th>
+                <th>Jobs posted</th>
+                <th>Applications</th>
+                <th>People hired</th>
+              </tr>
+            </thead>
+            <tbody>
+              {data?.departments?.map((department) => (
+                <tr key={department.category}>
+                  <td>{department.category}</td>
+                  <td>{department.job_count}</td>
+                  <td>{department.application_count}</td>
+                  <td>{department.accepted_count}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+        <Notice>{reportMessage}</Notice>
       </Panel>
     </DashLayout>
   );
@@ -1896,10 +2131,125 @@ function AdminDash() {
     </DashLayout>
   );
 }
+
+/*
+ * MINISTRY REPORT PAGE / UKURASA WA RIPOTI YA WIZARA
+ * EN: This dedicated sidebar page ranks the twenty most frequent hiring hotels.
+ * SW: Ukurasa huu wa sidebar hupanga hoteli ishirini zinazoajiri mara nyingi zaidi.
+ * EN: Vacancy counts determine rank while dates and monthly rates explain frequency.
+ * SW: Idadi ya ajira huamua nafasi; tarehe na wastani wa mwezi hueleza marudio.
+ * EN/SW: The same page also downloads the complete Ministry PDF report.
+ */
+function AdminReports() {
+  const { data, error } = useLoad("/admin/report-data/");
+  const [message, setMessage] = useState("");
+  async function downloadReport() {
+    try {
+      setMessage("Preparing Ministry report...");
+      await downloadFile("/admin/report/", "ministry-recruitment-report.pdf");
+      setMessage("Ministry report downloaded successfully.");
+    } catch (downloadError) {
+      setMessage(downloadError.message);
+    }
+  }
+  return (
+    <DashLayout role="admin">
+      <Title
+        title="Ministry recruitment reports"
+        text="Top 20 frequently hiring hotels, arranged from highest to lowest activity."
+      />
+      <div className="report-heading panel">
+        <div>
+          <strong>How frequency is measured</strong>
+          <p>
+            Ranking uses total vacancies posted. Jobs per month and the posting
+            period provide additional frequency detail.
+          </p>
+        </div>
+        <button className="btn" onClick={downloadReport}>
+          <FiDownload /> Download full PDF
+        </button>
+      </div>
+      <Notice error={error}>{message}</Notice>
+      <Panel title="Top 20 frequently hiring hotels">
+        <div className="table-wrap report-table">
+          <table>
+            <thead>
+              <tr>
+                <th>Rank and hotel</th>
+                <th>Hiring frequency</th>
+                <th>Applications</th>
+                <th>Department and position</th>
+                <th>Posting period</th>
+                <th>Hotel details</th>
+              </tr>
+            </thead>
+            <tbody>
+              {data?.results?.map((hotel) => (
+                <tr key={hotel.id}>
+                  <td>
+                    <strong>
+                      #{hotel.rank} {hotel.name}
+                    </strong>
+                    <small>
+                      {hotel.approved
+                        ? "Ministry approved"
+                        : "Approval pending"}
+                    </small>
+                  </td>
+                  <td>
+                    <strong>{hotel.job_count} jobs posted</strong>
+                    <small>{hotel.active_job_count} currently active</small>
+                    <small>{hotel.jobs_per_month} jobs per month</small>
+                  </td>
+                  <td>
+                    <strong>{hotel.application_count} applications</strong>
+                    <small>{hotel.accepted_count} people hired</small>
+                  </td>
+                  <td>
+                    <strong>{hotel.top_department}</strong>
+                    <small>Top position: {hotel.top_position}</small>
+                    <small>
+                      Departments:{" "}
+                      {hotel.departments
+                        .map((item) => `${item.category} (${item.job_count})`)
+                        .join(", ") || "None"}
+                    </small>
+                  </td>
+                  <td>
+                    <strong>
+                      {hotel.first_job_date
+                        ? new Date(hotel.first_job_date).toLocaleDateString()
+                        : "No postings"}
+                    </strong>
+                    <small>
+                      Latest:{" "}
+                      {hotel.latest_job_date
+                        ? new Date(hotel.latest_job_date).toLocaleDateString()
+                        : "None"}
+                    </small>
+                  </td>
+                  <td>
+                    <strong>{hotel.location}</strong>
+                    <small>Registration: {hotel.registration_number}</small>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+        {data && !data.results.length && (
+          <Empty text="No hotel hiring records yet." />
+        )}
+      </Panel>
+    </DashLayout>
+  );
+}
 // AdminList hutumia type moja kusimamia hotels, users au jobs.
 function AdminList({ type }) {
   const { data } = useLoad("/admin/overview/");
   const rows = data?.[type] || [];
+  const [selectedHotel, setSelectedHotel] = useState(null);
   async function action(row) {
     if (type === "hotels")
       await api(`/admin/hotels/${row.id}/approve/`, {
@@ -1955,6 +2305,11 @@ function AdminList({ type }) {
                     />
                   </td>
                   <td>
+                    {type === "hotels" && (
+                      <button onClick={() => setSelectedHotel(r.id)}>
+                        View full details
+                      </button>
+                    )}
                     <button onClick={() => action(r)}>
                       {(
                         type === "users"
@@ -1971,7 +2326,219 @@ function AdminList({ type }) {
           </table>
         </div>
       </Panel>
+      {selectedHotel && (
+        <AdminHotelDetail
+          hotelId={selectedHotel}
+          close={() => setSelectedHotel(null)}
+        />
+      )}
     </DashLayout>
+  );
+}
+
+/*
+ * HOTEL VERIFICATION VIEW / MUONEKANO WA UHAKIKI WA HOTELI
+ * EN: Ministry staff open this view from a hotel row before approving the account.
+ * SW: Wizara hufungua sehemu hii kutoka kwenye hotel row kabla ya kutoa idhini.
+ * EN: It displays every submitted identity, contact, licence and location field.
+ * SW: Inaonyesha utambulisho, mawasiliano, leseni na eneo lote lililowasilishwa.
+ * EN/SW: Approval is available inside the view after the evidence is reviewed.
+ */
+function AdminHotelDetail({ hotelId, close }) {
+  const { data, error } = useLoad(`/admin/hotels/${hotelId}/detail/`);
+  const [selectedRating, setSelectedRating] = useState("");
+  const [classificationMessage, setClassificationMessage] = useState("");
+
+  useEffect(() => {
+    if (data?.hotel) setSelectedRating(String(data.hotel.star_rating ?? 0));
+  }, [data]);
+
+  async function saveClassification() {
+    try {
+      const result = await api(`/admin/hotels/${hotelId}/classification/`, {
+        method: "POST",
+        body: JSON.stringify({ star_rating: Number(selectedRating) }),
+      });
+      setClassificationMessage(result.detail);
+      setTimeout(() => location.reload(), 700);
+    } catch (classificationError) {
+      setClassificationMessage(classificationError.message);
+    }
+  }
+  async function setApproval(approved) {
+    await api(`/admin/hotels/${hotelId}/approve/`, {
+      method: "POST",
+      body: JSON.stringify({ approved }),
+    });
+    location.reload();
+  }
+  const hotel = data?.hotel;
+  return (
+    <div className="modal hotel-verification-modal">
+      <section className="panel">
+        <button type="button" className="modal-x" onClick={close}>
+          <FiX />
+        </button>
+        <h2>Hotel verification details</h2>
+        <Notice error={error} />
+        {!data && !error && <Loader />}
+        {data && (
+          <>
+            <div className="profile-head verification-head">
+              {hotel.image ? (
+                <img src={hotel.image} alt={hotel.name} />
+              ) : (
+                <FaHotel />
+              )}
+              <div>
+                <h2>{hotel.name}</h2>
+                <Status value={hotel.approved ? "active" : "pending"} />
+                <HotelStars rating={hotel.star_rating} />
+                <p>Registered {new Date(hotel.created_at).toLocaleString()}</p>
+              </div>
+            </div>
+            <div className="verification-grid">
+              <VerificationItem label="Username" value={data.username} />
+              <VerificationItem
+                label="Account name"
+                value={data.full_name || "Not provided"}
+              />
+              <VerificationItem label="Email address" value={data.email} />
+              <VerificationItem label="Phone number" value={data.phone} />
+              <VerificationItem
+                label="Address / location"
+                value={hotel.location}
+              />
+              <VerificationItem label="TIN number" value={hotel.tin} />
+              <VerificationItem
+                label="Registration number"
+                value={hotel.registration_number}
+              />
+              <VerificationItem label="Latitude" value={hotel.latitude} />
+              <VerificationItem label="Longitude" value={hotel.longitude} />
+              <VerificationItem
+                label="Account active"
+                value={data.is_active ? "Yes" : "No"}
+              />
+              <VerificationItem
+                label="Account created"
+                value={new Date(data.date_joined).toLocaleString()}
+              />
+              <VerificationItem
+                label="Last login"
+                value={
+                  data.last_login
+                    ? new Date(data.last_login).toLocaleString()
+                    : "Never"
+                }
+              />
+            </div>
+            <div className="stats verification-stats">
+              <Stat
+                icon={FiBriefcase}
+                n={hotel.total_jobs}
+                text="Jobs posted"
+              />
+              <Stat icon={FiClock} n={hotel.active_jobs} text="Active jobs" />
+              <Stat
+                icon={FiUsers}
+                n={hotel.total_applications}
+                text="Applications"
+              />
+              <Stat
+                icon={FiCheckCircle}
+                n={hotel.accepted_applications}
+                text="People accepted"
+              />
+            </div>
+            <h3>Submitted verification documents</h3>
+            <div className="documents">
+              <a
+                className={!hotel.business_license ? "disabled" : ""}
+                href={hotel.business_license || "#"}
+                target="_blank"
+                rel="noreferrer"
+              >
+                Business licence
+                <span>
+                  {hotel.business_license
+                    ? "Open submitted PDF"
+                    : "Not submitted"}
+                </span>
+              </a>
+              <a
+                className={!hotel.image ? "disabled" : ""}
+                href={hotel.image || "#"}
+                target="_blank"
+                rel="noreferrer"
+              >
+                Hotel image
+                <span>{hotel.image ? "Open full image" : "Not submitted"}</span>
+              </a>
+            </div>
+            <div className="hotel-classification">
+              <div>
+                <h3>Official hotel star status</h3>
+                <p>
+                  Select the verified Ministry classification. This status will
+                  appear publicly on every job advertised by this hotel.
+                </p>
+              </div>
+              <label>
+                Hotel status
+                <select
+                  value={selectedRating}
+                  onChange={(event) => setSelectedRating(event.target.value)}
+                >
+                  <option value="0">Unclassified</option>
+                  <option value="1">1-star hotel</option>
+                  <option value="2">2-star hotel</option>
+                  <option value="3">3-star hotel</option>
+                  <option value="4">4-star hotel</option>
+                  <option value="5">5-star hotel</option>
+                </select>
+              </label>
+              <button
+                className="btn"
+                type="button"
+                onClick={saveClassification}
+              >
+                <FiStar /> Save star status
+              </button>
+              <Notice>{classificationMessage}</Notice>
+            </div>
+            <HotelDirections hotel={hotel} />
+            <div className="verification-actions">
+              <button
+                className="btn"
+                onClick={() => setApproval(true)}
+                disabled={hotel.approved}
+              >
+                <FiCheckCircle />{" "}
+                {hotel.approved ? "Already approved" : "Approve hotel"}
+              </button>
+              {hotel.approved && (
+                <button
+                  className="delete-action"
+                  onClick={() => setApproval(false)}
+                >
+                  Remove approval
+                </button>
+              )}
+            </div>
+          </>
+        )}
+      </section>
+    </div>
+  );
+}
+
+function VerificationItem({ label, value }) {
+  return (
+    <div className="verification-item">
+      <small>{label}</small>
+      <strong>{value ?? "Not provided"}</strong>
+    </div>
   );
 }
 /*
@@ -2361,6 +2928,14 @@ export default function App() {
         element={
           <Protected role="admin">
             <AdminList type="jobs" />
+          </Protected>
+        }
+      />
+      <Route
+        path="/admin/dashboard/reports"
+        element={
+          <Protected role="admin">
+            <AdminReports />
           </Protected>
         }
       />

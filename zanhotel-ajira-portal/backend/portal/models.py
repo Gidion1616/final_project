@@ -37,6 +37,23 @@ class Hotel(models.Model):
     registration_number = models.CharField(max_length=80, unique=True)
     business_license = models.FileField(upload_to="licenses/", blank=True)
     approved = models.BooleanField(default=False)
+    # HOTEL STAR CLASSIFICATION / DARAJA LA NYOTA LA HOTELI
+    # EN: Zero means the Ministry has not classified the hotel yet.
+    # SW: Sifuri ina maana Wizara bado haijaipa hoteli daraja rasmi.
+    # EN: Values one through five represent the official hotel star level.
+    # SW: Thamani moja hadi tano zinawakilisha daraja rasmi la nyota.
+    # EN/SW: Only Ministry endpoints expose controls that change this field.
+    star_rating = models.PositiveSmallIntegerField(
+        choices=[
+            (0, "Unclassified"),
+            (1, "1 Star"),
+            (2, "2 Stars"),
+            (3, "3 Stars"),
+            (4, "4 Stars"),
+            (5, "5 Stars"),
+        ],
+        default=0,
+    )
     created_at = models.DateTimeField(auto_now_add=True)
 
 

@@ -13,7 +13,12 @@ if ENV_FILE.exists():
         if not line or line.startswith("#") or "=" not in line:
             continue
         key, value = line.split("=", 1)
-        os.environ.setdefault(key.strip(), value.strip().strip('"').strip("'"))
+        key = key.strip()
+        value = value.strip().strip('"').strip("'")
+        # EN: Windows may define an empty variable; treat it as missing so .env works.
+        # SW: Windows inaweza kuwa na variable tupu; itumie .env badala yake.
+        if not os.environ.get(key):
+            os.environ[key] = value
 # Mipangilio ya msingi ya usalama wa Django na application zilizosakinishwa.
 SECRET_KEY = "change-this-in-production"
 DEBUG = True
@@ -96,8 +101,8 @@ EMAIL_BACKEND = os.getenv(
 )
 EMAIL_HOST = os.getenv("EMAIL_HOST", "localhost")
 EMAIL_PORT = int(os.getenv("EMAIL_PORT", "587"))
-EMAIL_HOST_USER = os.getenv("msagaladaines@gmail.com", "")
-EMAIL_HOST_PASSWORD = os.getenv("msagaladaines@gmail.com", "")
+EMAIL_HOST_USER = os.getenv("EMAIL_HOST_USER", "")
+EMAIL_HOST_PASSWORD = os.getenv("EMAIL_HOST_PASSWORD", "")
 EMAIL_USE_TLS = os.getenv("EMAIL_USE_TLS", "True").lower() == "true"
 EMAIL_USE_SSL = os.getenv("EMAIL_USE_SSL", "False").lower() == "true"
 EMAIL_TIMEOUT = int(os.getenv("EMAIL_TIMEOUT", "20"))
