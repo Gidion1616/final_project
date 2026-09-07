@@ -32,6 +32,7 @@ import {
   FiUser,
   FiUsers,
   FiX,
+  
 } from "react-icons/fi";
 import { FaBirthdayCake, FaHotel, FaVenusMars } from "react-icons/fa";
 import {
@@ -100,7 +101,7 @@ function Notice({ error, children }) {
     <div className="notice">{children}</div>
   ) : null;
 }
-// Hubadilisha thamani ya status kuwa badge yenye rangi inayofaa.
+// Hubadilisha rangi ya status kuwa badge yenye rangi inayofaa.
 function Status({ value }) {
   return <span className={`status ${value}`}>{value}</span>;
 }
@@ -108,9 +109,7 @@ function Status({ value }) {
 /*
  * HOTEL STAR DISPLAY / MUONEKANO WA NYOTA ZA HOTELI
  * EN: The component converts the Ministry's numeric classification into gold stars.
- * SW: Component hubadilisha daraja la namba la Wizara kuwa nyota za dhahabu.
  * EN: It is reusable so cards, descriptions and verification show identical ratings.
- * SW: Inatumika sehemu nyingi ili kadi, maelezo na uhakiki vionyeshe sawa.
  * EN/SW: A zero value clearly identifies a hotel that is not classified yet.
  */
 function HotelStars({ rating = 0 }) {
@@ -128,7 +127,7 @@ function HotelStars({ rating = 0 }) {
     </span>
   );
 }
-// Huonyesha nembo; inverse hutumika kwenye background yenye rangi nzito.
+// Huonyesha nembo;
 function Logo({ inverse = false }) {
   return (
     <span className={`brand ${inverse ? "inverse" : ""}`}>
@@ -139,7 +138,7 @@ function Logo({ inverse = false }) {
     </span>
   );
 }
-// Link rasmi za utalii; target na rel hufungua tab mpya kwa usalama.
+// Link za utalii; target na rel hufungua tab mpya kwa usalama.
 function SocialLinks() {
   const links = [
     [
@@ -275,6 +274,7 @@ function JobCard({ job }) {
         <button className="btn" onClick={apply}>
           View & apply <FiArrowRight />
         </button>
+        {/* /*more info btn/* */}
         <button
           type="button"
           className={`more-info ${showInfo ? "active" : ""}`}
@@ -322,15 +322,7 @@ function JobCard({ job }) {
     </article>
   );
 }
-/*
- * HOME PAGE RECENT JOBS / AJIRA MPYA ZA HOME
- * EN: Home requests /jobs/?recent=1, so it receives only newly posted jobs.
- * SW: Home huomba /jobs/?recent=1, hivyo hupokea ajira zilizowekwa karibuni pekee.
- * EN: Django applies a three-day created_at window; React does not delete any job.
- * SW: Django huchuja created_at ya siku tatu; React haifuti ajira yoyote.
- * EN: After day three the job disappears here but remains searchable on Jobs.
- * SW: Baada ya siku tatu ajira huondoka Home lakini huendelea kuonekana Jobs page.
- */
+
 function Home() {
   const { data } = useLoad("/jobs/?recent=1");
   const { data: home } = useLoad("/site-content/");
@@ -431,14 +423,7 @@ function Home() {
     </Layout>
   );
 }
-/*
- * ALL JOBS PAGE / UKURASA WA AJIRA ZOTE
- * EN: This page calls /jobs without recent=1, therefore it is not limited to 3 days.
- * SW: Page hii huita /jobs bila recent=1, hivyo haizuiliwi na muda wa siku 3.
- * EN: Search text and category are kept in React state and sent to Django as query data.
- * SW: Search na category huhifadhiwa kwenye state na kutumwa Django kama query data.
- * EN/SW: Active, unexpired jobs stay here / Ajira hai zenye deadline hubaki hapa.
- */
+
 function Jobs() {
   const [q, setQ] = useState("");
   const [cat, setCat] = useState("");
@@ -503,7 +488,7 @@ function Jobs() {
     </Layout>
   );
 }
-// JobDetail huonyesha taarifa kamili, ramani na kutuma ombi la kazi.
+
 function JobDetail() {
   const { id } = useParams();
   const nav = useNavigate();
@@ -580,17 +565,7 @@ function JobDetail() {
   );
 }
 
-/*
- * LIVE DIRECTIONS / MAELEKEZO YA MOJA KWA MOJA
- * EN: The browser asks permission to read the visitor's current GPS coordinates.
- * SW: Browser huomba ruhusa ya kusoma coordinate za GPS za alipo mtumiaji.
- * EN: When permission is granted, the embedded map shows a route to the hotel.
- * SW: Ruhusa ikitolewa, ramani inaonyesha njia kutoka alipo hadi kwenye hoteli.
- * EN: The distance shown is a straight-line estimate, while Google provides road directions.
- * SW: Umbali ni makadirio ya mstari; Google hutoa njia halisi ya barabarani.
- * EN: Without permission, the hotel map still works and Google chooses the starting point.
- * SW: Bila ruhusa, ramani ya hoteli hubaki na Google humruhusu kuchagua pa kuanzia.
- */
+// map
 function HotelDirections({ hotel }) {
   const [current, setCurrent] = useState(null);
   const [locationMessage, setLocationMessage] = useState("");
@@ -699,15 +674,7 @@ function HotelDirections({ hotel }) {
     </div>
   );
 }
-/*
- * REGISTRATION / USAJILI
- * EN: The user first chooses Job Seeker or Hotel, which changes the visible fields.
- * SW: Mtumiaji huchagua Job Seeker au Hotel na fields hubadilika kulingana na chaguo.
- * EN: FormData is used because photos, CVs, certificates and licenses are binary files.
- * SW: FormData hutumika kwa kuwa picha, CV, certificates na leseni ni mafaili.
- * EN: Django performs final validation; success redirects the person to Login.
- * SW: Django hufanya uhakiki wa mwisho; mafanikio humpeleka mtumiaji Login.
- */
+
 function Register() {
   const [type, setType] = useState("jobseeker");
   const [msg, setMsg] = useState("");
@@ -795,7 +762,7 @@ function Register() {
     </Layout>
   );
 }
-// FieldTitle huunganisha icon na jina la field kwa muonekano unaofanana.
+
 function FieldTitle({ icon: Icon, children }) {
   return (
     <span className="field-title">
@@ -804,7 +771,7 @@ function FieldTitle({ icon: Icon, children }) {
     </span>
   );
 }
-// Fields zote binafsi na nyaraka zinazohitajika kwa Job Seeker.
+
 function JobseekerFields() {
   const minimumAgeDate = new Date();
   minimumAgeDate.setFullYear(minimumAgeDate.getFullYear() - 19);
@@ -872,7 +839,7 @@ function JobseekerFields() {
     </>
   );
 }
-// Fields za biashara, leseni na coordinate za ramani ya hoteli.
+
 function HotelFields() {
   return (
     <>
@@ -937,7 +904,7 @@ function HotelFields() {
     </>
   );
 }
-// File component hutengeneza sehemu moja ya kupakia picha au PDF.
+// File component hutengeneza sehemu moja ya picha au PDF.
 function File({
   name,
   text,
@@ -954,13 +921,10 @@ function File({
   );
 }
 /*
- * LOGIN AND ROUTE SECURITY / KUINGIA NA ULINZI WA ROUTE
+ * LOGIN AND ROUTE SECURITY
  * EN: Login posts credentials to Django and receives a token plus user profile.
- * SW: Login hutuma credentials Django na kupokea token pamoja na wasifu.
  * EN: The session helper stores them in localStorage so refresh does not log out.
- * SW: session helper huhifadhi localStorage ili refresh isiondoe login.
  * EN: Protected compares the required role before rendering a private dashboard.
- * SW: Protected hulinganisha role kabla ya kuonyesha dashboard ya siri.
  */
 function Login() {
   const [msg, setMsg] = useState("");
@@ -1014,13 +978,10 @@ function Login() {
   );
 }
 /*
- * PASSWORD RESET / KUBADILI PASSWORD ILIYOSAHAULIKA
+ * PASSWORD RESET
  * EN: The request page sends only an email and always shows a neutral response.
- * SW: Page ya kwanza hutuma email pekee na kuonyesha jibu lisilofichua akaunti.
  * EN: The email link carries Django's signed uid and expiring reset token.
- * SW: Link ya email ina uid na token salama ya Django yenye muda wa kuisha.
  * EN: The confirm page sends two matching new-password fields to Django.
- * SW: Page ya mwisho hutuma password mpya na uthibitisho wake kwenda Django.
  */
 function ForgotPassword() {
   const [msg, setMsg] = useState("");
@@ -1189,13 +1150,10 @@ function DashLayout({ role, children }) {
   );
 }
 /*
- * JOB SEEKER WORKSPACE / ENEO LA JOB SEEKER
+ * JOBSEEKER Dashboard WORKSPACE 
  * EN: These pages summarize applications, browse jobs and maintain the user profile.
- * SW: Pages hizi huonyesha maombi, ajira na kuruhusu kusimamia wasifu.
  * EN: Application filters run in React after Django returns the owner's records.
- * SW: Filter za maombi hufanyika React baada ya Django kurudisha data ya mwenyewe.
  * EN: Pending notes can be edited; individual or all applications can be deleted.
- * SW: Ujumbe wa pending unaweza kuhaririwa; ombi moja au yote yanaweza kufutwa.
  */
 function SeekerDash() {
   const s = session.get();
@@ -1235,7 +1193,7 @@ function SeekerDash() {
     </DashLayout>
   );
 }
-// Usimamizi wa maombi: filter, edit, delete na clear all.
+// Jobseeker Applications: filter, edit, delete na clear all.
 function SeekerApplications() {
   const { data, error } = useLoad("/applications/");
   const [filter, setFilter] = useState("all");
@@ -1288,7 +1246,7 @@ function SeekerApplications() {
     </DashLayout>
   );
 }
-// Jedwali linalotumika kuonyesha maombi na actions zake kwa hiari.
+// Jedwali linalotumika kuonyesha maombi na actions zake.
 function ApplicationTable({ rows, detailed, onEdit, onDelete }) {
   return rows.length ? (
     <div className="table-wrap">
@@ -1349,7 +1307,7 @@ function ApplicationTable({ rows, detailed, onEdit, onDelete }) {
     <Empty text="No applications to show." />
   );
 }
-// Job Seeker anaweza kubadili ujumbe wake wakati uamuzi wa hoteli bado ni pending.
+// Job Seeker anaweza kubadili ujumbe wake wakati uamuzi wa hoteli bado application iko pending.
 function EditApplication({ application, close }) {
   const [note, setNote] = useState(application.applicant_note || "");
   const [msg, setMsg] = useState("");
@@ -1533,11 +1491,9 @@ function JobBrowser() {
   );
 }
 /*
- * HOTEL PROFILE / WASIFU WA HOTELI
+ * HOTEL PROFILE 
  * EN: Hotel edits account credentials, contact information and business data.
- * SW: Hoteli hubadili username, password, mawasiliano na taarifa za biashara.
  * EN: Image/license fields are optional and preserve existing files when empty.
- * SW: Picha/leseni ni optional na mafaili ya zamani hubaki fields zikiwa tupu.
  * EN/SW: Ministry approval cannot be changed here / Idhini hubadilishwa na Admin pekee.
  */
 function HotelProfile() {
@@ -1663,13 +1619,10 @@ function HotelProfile() {
   );
 }
 /*
- * HOTEL WORKSPACE / ENEO LA HOTELI
+ * HOTEL WORKSPACE 
  * EN: The overview loads totals and highlights the job with most applications.
- * SW: Overview huleta jumla na kuonyesha ajira yenye maombi mengi kuliko nyingine.
  * EN: Manage Jobs provides create, edit and delete actions for vacancies.
- * SW: Manage Jobs huruhusu kutangaza, kuhariri na kufuta nafasi za kazi.
- * EN: Applications exposes applicant profiles/documents and employer decisions.
- * SW: Applications huonyesha wasifu/nyaraka na maamuzi ya mwajiri.
+ * EN: Applications shows applicant profiles/documents and employer decisions.
  */
 function HotelDash() {
   const { data } = useLoad("/hotel/overview/");
@@ -1751,7 +1704,7 @@ function HotelDash() {
     </DashLayout>
   );
 }
-// HotelJobs hutangaza, kuhariri na kufuta nafasi za kazi za hoteli.
+// HotelJobs hutangaza, kuedit na kufuta nafasi za kazi za hoteli.
 function HotelJobs() {
   const { data } = useLoad("/hotel/jobs/");
   const [edit, setEdit] = useState(null);
@@ -2064,13 +2017,10 @@ function Applicant({ a }) {
   );
 }
 /*
- * ADMIN WORKSPACE / ENEO LA ADMIN
+ * ADMIN WORKSPACE
  * EN: The Ministry dashboard loads system totals and pending hotel approvals.
- * SW: Dashboard ya Wizara huleta takwimu na hoteli zinazosubiri idhini.
  * EN: Reusable AdminList changes behavior for hotels, users and jobs using type.
- * SW: AdminList hubadili kazi kwa hotels, users na jobs kwa kutumia type.
  * EN: Settings updates portal details and maintenance and triggers notifications.
- * SW: Settings hubadili taarifa za portal na maintenance na kutuma notifications.
  */
 function AdminDash() {
   const { data } = useLoad("/admin/overview/");
@@ -2133,12 +2083,10 @@ function AdminDash() {
 }
 
 /*
- * MINISTRY REPORT PAGE / UKURASA WA RIPOTI YA WIZARA
+ * MINISTRY REPORT PAGE 
  * EN: This dedicated sidebar page ranks the twenty most frequent hiring hotels.
- * SW: Ukurasa huu wa sidebar hupanga hoteli ishirini zinazoajiri mara nyingi zaidi.
  * EN: Vacancy counts determine rank while dates and monthly rates explain frequency.
- * SW: Idadi ya ajira huamua nafasi; tarehe na wastani wa mwezi hueleza marudio.
- * EN/SW: The same page also downloads the complete Ministry PDF report.
+ * EN: The same page also downloads the complete Ministry PDF report.
  */
 function AdminReports() {
   const { data, error } = useLoad("/admin/report-data/");
@@ -2245,7 +2193,7 @@ function AdminReports() {
     </DashLayout>
   );
 }
-// AdminList hutumia type moja kusimamia hotels, users au jobs.
+// AdminList hutumia user-type moja kusimamia hotels, users au jobs.
 function AdminList({ type }) {
   const { data } = useLoad("/admin/overview/");
   const rows = data?.[type] || [];
@@ -2337,12 +2285,10 @@ function AdminList({ type }) {
 }
 
 /*
- * HOTEL VERIFICATION VIEW / MUONEKANO WA UHAKIKI WA HOTELI
+ * HOTEL VERIFICATION VIEW 
  * EN: Ministry staff open this view from a hotel row before approving the account.
- * SW: Wizara hufungua sehemu hii kutoka kwenye hotel row kabla ya kutoa idhini.
  * EN: It displays every submitted identity, contact, licence and location field.
- * SW: Inaonyesha utambulisho, mawasiliano, leseni na eneo lote lililowasilishwa.
- * EN/SW: Approval is available inside the view after the evidence is reviewed.
+ * EN: Approval is available inside the view after the evidence is reviewed.
  */
 function AdminHotelDetail({ hotelId, close }) {
   const { data, error } = useLoad(`/admin/hotels/${hotelId}/detail/`);
@@ -2542,12 +2488,10 @@ function VerificationItem({ label, value }) {
   );
 }
 /*
- * HOME CONTENT MANAGEMENT / USIMAMIZI WA HOME
+ * HOME CONTENT MANAGEMENT
  * EN: Admin edits hero text and optionally uploads a replacement image.
- * SW: Admin hubadili maandishi ya hero na anaweza kupakia picha mpya.
  * EN: FormData preserves binary image data when the PATCH request is sent.
- * SW: FormData huhifadhi data ya picha wakati PATCH inatumwa.
- * EN/SW: Empty image keeps the current file / Picha tupu huacha ya zamani.
+ * EN: Empty image keeps the current file / Picha tupu huacha ya zamani.
  */
 function AdminHome() {
   const { data } = useLoad("/site-content/");
@@ -2670,13 +2614,10 @@ function AdminSettings() {
   );
 }
 /*
- * ADMIN EMAIL MANAGEMENT / USIMAMIZI WA EMAIL WA ADMIN
+ * ADMIN EMAIL MANAGEMENT 
  * EN: Recipient choices come from Django and contain active users with email only.
- * SW: Orodha hutoka Django na ina watumiaji hai wenye email pekee.
  * EN: Individual mode sends to one selected person; group modes send privately.
- * SW: Individual hutuma kwa mtu mmoja; group hutuma kwa kila mtu kwa siri.
  * EN: Subject and message are required and delivery results are shown below the form.
- * SW: Subject na message ni lazima na matokeo ya utumaji huonyeshwa chini ya fomu.
  */
 function AdminEmail() {
   const { data, error } = useLoad("/admin/email/");

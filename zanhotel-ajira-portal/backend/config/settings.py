@@ -58,9 +58,15 @@ TEMPLATES = [
     }
 ]
 WSGI_APPLICATION = "config.wsgi.application"
-# SQLite inafaa kwa development; production inapendekezwa kutumia PostgreSQL.
 DATABASES = {
-    "default": {"ENGINE": "django.db.backends.sqlite3", "NAME": BASE_DIR / "db.sqlite3"}
+    "default": {
+        "ENGINE": "django.db.backends.postgresql",
+        "NAME": "zanhotel_ajira_portal",
+        "USER": "gidion",
+        "PASSWORD": "1234",
+        "HOST": "localhost",
+        "PORT": "8080",
+    }
 }
 AUTH_PASSWORD_VALIDATORS = [
     {"NAME": "django.contrib.auth.password_validation.MinimumLengthValidator"}

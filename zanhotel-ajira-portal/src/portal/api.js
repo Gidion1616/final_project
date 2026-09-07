@@ -1,12 +1,12 @@
 /* Anwani kuu ya API; Vite hupeleka /api kwenda Django wakati wa development. */
 const BASE = import.meta.env.VITE_API_URL || "/api";
-/* Huhifadhi Token na jukumu la mtumiaji ili viendelee baada ya page refresh. */
+/* Huhifadhi Token za mtumiaji ili iendelee baada ya page refresh. */
 export const session = {
   get: () => JSON.parse(localStorage.getItem("zanhotel_session") || "null"),
   set: (v) => localStorage.setItem("zanhotel_session", JSON.stringify(v)),
   clear: () => localStorage.removeItem("zanhotel_session"),
 };
-/* Huongeza headers za Token/JSON, husoma majibu na kuonyesha makosa kwa mtindo mmoja. */
+/* Huongeza headers za Token/JSON, husoma majibu na kuonyesha makosa. */
 export async function api(path, options = {}) {
   const s = session.get();
   const headers = {
@@ -34,12 +34,10 @@ export async function api(path, options = {}) {
 }
 
 /*
- * AUTHENTICATED FILE DOWNLOAD / UPAKUAJI WA FAILI ULIOHIFADHIWA
+ * AUTHENTICATED FILE DOWNLOAD
  * EN: Reports require a login token, which a normal anchor link cannot attach.
- * SW: Ripoti zinahitaji token ya login ambayo link ya kawaida haiwezi kutuma.
  * EN: This helper fetches the protected file, creates a temporary browser URL,
- * SW: Helper hii huleta faili, hutengeneza URL ya muda ndani ya browser,
- * EN/SW: then starts the download and immediately releases that temporary URL.
+ * EN: then starts the download and immediately releases that temporary URL.
  */
 export async function downloadFile(path, filename) {
   const s = session.get();

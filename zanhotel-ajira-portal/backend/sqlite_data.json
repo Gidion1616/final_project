@@ -1,0 +1,1252 @@
+[
+{
+  "model": "sessions.session",
+  "pk": "0h59btsddoz3w6qqt1vj7vre9gb2hyof",
+  "fields": {
+    "session_data": ".eJxVjDkOwjAQAP_iGllr45OSnjdYu94NCSBHylEh_o4spYB2ZjRvVXDfxrKvspSJ1UUZdfplhPUprQt-YLvPus5tWybSPdGHXfVtZnldj_ZvMOI69i1ARkcpsI0mZc7ekSEnA4XIkSydg3HiB-84VLQQGQClpuylDimA-nwB03030g:1wsIPN:Qo0fbmZNpEYLMzOaIZS5okUGS-4A8JRpENegmgP5Wkc",
+    "expire_date": "2026-08-21T11:06:37.076Z"
+  }
+},
+{
+  "model": "sessions.session",
+  "pk": "2f1ic0s1xj49ayv427i5nnoqd0mc80ge",
+  "fields": {
+    "session_data": ".eJxVjDkOwjAQAP_iGllr45OSnjdYu94NCSBHylEh_o4spYB2ZjRvVXDfxrKvspSJ1UUZdfplhPUprQt-YLvPus5tWybSPdGHXfVtZnldj_ZvMOI69i1ARkcpsI0mZc7ekSEnA4XIkSydg3HiB-84VLQQGQClpuylDimA-nwB03030g:1wuTuD:u5hFRsSmepWnnb9Y5qHtOHhysgcvL47pkyW5sy9bOcI",
+    "expire_date": "2026-08-27T11:47:29.413Z"
+  }
+},
+{
+  "model": "sessions.session",
+  "pk": "oot48q9bfmmac072qcszm34turr43fh5",
+  "fields": {
+    "session_data": ".eJxVjDkOwjAQAP_iGllr45OSnjdYu94NCSBHylEh_o4spYB2ZjRvVXDfxrKvspSJ1UUZdfplhPUprQt-YLvPus5tWybSPdGHXfVtZnldj_ZvMOI69i1ARkcpsI0mZc7ekSEnA4XIkSydg3HiB-84VLQQGQClpuylDimA-nwB03030g:1wrIrE:flpB-Tx6Wx6hwAPwwazbJe9T6y9eznv1VeQKTsCQ85g",
+    "expire_date": "2026-08-18T17:23:16.776Z"
+  }
+},
+{
+  "model": "portal.user",
+  "fields": {
+    "password": "pbkdf2_sha256$870000$nijABqRK25XCv9r41Ty634$BCYtmqP+j0PvcCZLFGwPQQFA/8Z6YK4uGQG7Ug4q7bQ=",
+    "last_login": "2026-08-13T11:46:01.519Z",
+    "is_superuser": true,
+    "username": "Gidion",
+    "first_name": "",
+    "last_name": "",
+    "email": "gidion@gmail.com",
+    "is_staff": true,
+    "is_active": true,
+    "date_joined": "2026-08-04T17:20:48.216Z",
+    "role": "jobseeker",
+    "phone": "",
+    "address": "",
+    "date_of_birth": null,
+    "gender": "",
+    "photo": "",
+    "cv": "",
+    "recommendation_letter": "",
+    "academic_certificates": "",
+    "other_certificates": "",
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "portal.user",
+  "fields": {
+    "password": "pbkdf2_sha256$870000$NTCDlDWZ09UYF0pXyWLijF$RxhTrCGmb/LhYRpRh5XtxFsqu2Q3J0CHFN2nK+iOMbo=",
+    "last_login": null,
+    "is_superuser": false,
+    "username": "Alma",
+    "first_name": "Alma Beach Hotel",
+    "last_name": "",
+    "email": "msagaladaines@gmail.com",
+    "is_staff": false,
+    "is_active": true,
+    "date_joined": "2026-08-04T17:30:07.950Z",
+    "role": "hotel",
+    "phone": "0716011177",
+    "address": "Jumbi",
+    "date_of_birth": null,
+    "gender": "",
+    "photo": "",
+    "cv": "",
+    "recommendation_letter": "",
+    "academic_certificates": "",
+    "other_certificates": "",
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "portal.user",
+  "fields": {
+    "password": "pbkdf2_sha256$870000$k2jCJgzfoyA92XJwSFCilS$qANyrne5TV5c1kTWPg4iI8WWeusapWQgTZAgOanSC1Y=",
+    "last_login": null,
+    "is_superuser": false,
+    "username": "Aluna",
+    "first_name": "Aluna Beach Resort",
+    "last_name": "",
+    "email": "msagaladaines@gmail.com",
+    "is_staff": false,
+    "is_active": true,
+    "date_joined": "2026-08-05T17:00:04.093Z",
+    "role": "hotel",
+    "phone": "0716011177",
+    "address": "Paje",
+    "date_of_birth": null,
+    "gender": "",
+    "photo": "",
+    "cv": "",
+    "recommendation_letter": "",
+    "academic_certificates": "",
+    "other_certificates": "",
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "portal.user",
+  "fields": {
+    "password": "pbkdf2_sha256$870000$0NqHrPTgOeiO7oxt2Rn8V6$nPRdqzWw4jQNFIK5qd1ITDLw5jXOf2PdlAKgmuFsCrY=",
+    "last_login": null,
+    "is_superuser": false,
+    "username": "Dainess",
+    "first_name": "Dainess Phanuel",
+    "last_name": "",
+    "email": "msagaladaines@gmail.com",
+    "is_staff": false,
+    "is_active": true,
+    "date_joined": "2026-08-07T12:32:21.127Z",
+    "role": "jobseeker",
+    "phone": "+255716011109",
+    "address": "Jumbi, Zanzibar",
+    "date_of_birth": "2000-02-02",
+    "gender": "Female",
+    "photo": "profiles/hotel-staff.png",
+    "cv": "documents/template-paper.pdf",
+    "recommendation_letter": "documents/Signed_declaration-universitat_popeu_barcelona.pdf",
+    "academic_certificates": "documents/template-paper_fpGmBQm.pdf",
+    "other_certificates": "documents/Signed_declaration-universitat_popeu_barcelona_2zL8EFo.pdf",
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "portal.user",
+  "fields": {
+    "password": "pbkdf2_sha256$870000$Y5tr6vw7FT0jqA0z8xYxb3$9tcXgx21d5RjsILPslJsVt2jpGbCqzFdyGLdFz/SU+Q=",
+    "last_login": null,
+    "is_superuser": false,
+    "username": "IT MANAGER",
+    "first_name": "Gidion",
+    "last_name": "Gidion",
+    "email": "ggidion897@gmail.com",
+    "is_staff": false,
+    "is_active": true,
+    "date_joined": "2026-08-07T12:38:28.028Z",
+    "role": "jobseeker",
+    "phone": "+255716011177",
+    "address": "Jumbi",
+    "date_of_birth": "2000-10-12",
+    "gender": "Male",
+    "photo": "profiles/1726813135580.jpeg",
+    "cv": "documents/Form_Four_Certificate.pdf",
+    "recommendation_letter": "documents/Form_six_certificate.pdf",
+    "academic_certificates": "documents/Form_Four_Certificate_07kukUc.pdf",
+    "other_certificates": "documents/Form_six_certificate_BrUzWOd.pdf",
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "portal.user",
+  "fields": {
+    "password": "pbkdf2_sha256$870000$V9euzqJkSwZu2EklkOQbZ9$yuTfTs6wMjv93XQxcPj7hy4f9V0/qUi1xJ1GdC9KBEw=",
+    "last_login": null,
+    "is_superuser": false,
+    "username": "Verde",
+    "first_name": "Verde Luxuly Beach Hotel",
+    "last_name": "",
+    "email": "ggidion897@gmail.com",
+    "is_staff": false,
+    "is_active": true,
+    "date_joined": "2026-08-07T12:43:24.509Z",
+    "role": "hotel",
+    "phone": "0716011177",
+    "address": "Bububu",
+    "date_of_birth": null,
+    "gender": "",
+    "photo": "",
+    "cv": "",
+    "recommendation_letter": "",
+    "academic_certificates": "",
+    "other_certificates": "",
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "portal.user",
+  "fields": {
+    "password": "pbkdf2_sha256$870000$3PIZZOmpEyZKulXdPCH5oa$jeerFJ0gROaj1CgJfLDvgdVz1P1+63r9R80SD0MzUMM=",
+    "last_login": null,
+    "is_superuser": false,
+    "username": "Verde123",
+    "first_name": "Verde Luxuly Beach Hotel",
+    "last_name": "",
+    "email": "ggidion897@gmail.com",
+    "is_staff": false,
+    "is_active": true,
+    "date_joined": "2026-08-07T12:43:55.884Z",
+    "role": "hotel",
+    "phone": "0716011177",
+    "address": "Bububu",
+    "date_of_birth": null,
+    "gender": "",
+    "photo": "",
+    "cv": "",
+    "recommendation_letter": "",
+    "academic_certificates": "",
+    "other_certificates": "",
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "portal.user",
+  "fields": {
+    "password": "pbkdf2_sha256$870000$PBd5WNLpfo445zs8PJI773$J5dy9F2ckzKB905a/AOrGpv3m1pnep1UMpobwMEg8hw=",
+    "last_login": null,
+    "is_superuser": false,
+    "username": "Azam",
+    "first_name": "Verde Luxuly Beach Hotel",
+    "last_name": "",
+    "email": "ggidion897@gmail.com",
+    "is_staff": false,
+    "is_active": true,
+    "date_joined": "2026-08-07T12:45:22.905Z",
+    "role": "hotel",
+    "phone": "0716011177",
+    "address": "Bububu",
+    "date_of_birth": null,
+    "gender": "",
+    "photo": "",
+    "cv": "",
+    "recommendation_letter": "",
+    "academic_certificates": "",
+    "other_certificates": "",
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "portal.user",
+  "fields": {
+    "password": "pbkdf2_sha256$870000$BNlIi22BCDqQpEJQM4CLMP$TLi5d+1R4TNJKCPnwdlQHnWXQDZeiqeke2BfuJP76w0=",
+    "last_login": null,
+    "is_superuser": false,
+    "username": "Shukrani",
+    "first_name": "Shukrani Palace",
+    "last_name": "",
+    "email": "msagaladaines@gmail.com",
+    "is_staff": false,
+    "is_active": true,
+    "date_joined": "2026-08-07T13:29:36.403Z",
+    "role": "hotel",
+    "phone": "0716011177",
+    "address": "Michamvi",
+    "date_of_birth": null,
+    "gender": "",
+    "photo": "",
+    "cv": "",
+    "recommendation_letter": "",
+    "academic_certificates": "",
+    "other_certificates": "",
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "portal.user",
+  "fields": {
+    "password": "pbkdf2_sha256$870000$AwDuON0hCDwcHxfqjfb5uI$TKDxiQsn3q/Rb3OigpskKJJuFYoYR7kTJG9GK+iQRl0=",
+    "last_login": null,
+    "is_superuser": false,
+    "username": "Akram",
+    "first_name": "Akram",
+    "last_name": "Ali Omar",
+    "email": "akram123@gmail.com",
+    "is_staff": false,
+    "is_active": true,
+    "date_joined": "2026-08-13T09:09:14.669Z",
+    "role": "jobseeker",
+    "phone": "0678901230",
+    "address": "Tunguu",
+    "date_of_birth": "1987-06-11",
+    "gender": "Male",
+    "photo": "profiles/Msc_Admission_letter_page_1.png",
+    "cv": "documents/DANIEL_PHANUEL_NYAMWANJI_CV_j3ZHjqp.pdf",
+    "recommendation_letter": "documents/DAINESS_PHANUEL_CV_SowWUwa.pdf",
+    "academic_certificates": "documents/DAINESS_PHANUEL_CV_3g3IfS2.pdf",
+    "other_certificates": "documents/DANIEL_PHANUEL_NYAMWANJI_CV_hemjDVr.pdf",
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "portal.user",
+  "fields": {
+    "password": "pbkdf2_sha256$870000$ywnIK3FBTJ26GtCOsj4pba$sIyXKctQ9wj0dISWXtD0nE6Rx5BDFIpLUdaO3wQoZ1Y=",
+    "last_login": null,
+    "is_superuser": false,
+    "username": "Aluna123",
+    "first_name": "Aluna Boutique Beach Hotel",
+    "last_name": "",
+    "email": "aluna123@gmail.com",
+    "is_staff": false,
+    "is_active": true,
+    "date_joined": "2026-08-13T09:17:54.424Z",
+    "role": "hotel",
+    "phone": "0654535251",
+    "address": "Paje",
+    "date_of_birth": null,
+    "gender": "",
+    "photo": "",
+    "cv": "",
+    "recommendation_letter": "",
+    "academic_certificates": "",
+    "other_certificates": "",
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "portal.user",
+  "fields": {
+    "password": "pbkdf2_sha256$870000$0rso0oY9gQFrA6rRqMoOyQ$ZMthzmLuu5cDhGSeY5OHnOsMmNQJl2ZVSKlrZ6xz914=",
+    "last_login": null,
+    "is_superuser": false,
+    "username": "testseeker20260813134911",
+    "first_name": "Test",
+    "last_name": "Job Seeker",
+    "email": "ggidion897@gmail.com",
+    "is_staff": false,
+    "is_active": true,
+    "date_joined": "2026-08-13T10:49:11.211Z",
+    "role": "jobseeker",
+    "phone": "+255700000001",
+    "address": "Zanzibar",
+    "date_of_birth": "2000-01-01",
+    "gender": "Male",
+    "photo": "profiles/1726813135580_l8YtL8m.jpeg",
+    "cv": "documents/DAINESS_PHANUEL_CV_3g3IfS2_jez6PJ7.pdf",
+    "recommendation_letter": "documents/DAINESS_PHANUEL_CV_3g3IfS2_SIqlmdx.pdf",
+    "academic_certificates": "documents/DAINESS_PHANUEL_CV_3g3IfS2_7ahvxkD.pdf",
+    "other_certificates": "documents/DAINESS_PHANUEL_CV_3g3IfS2_jZXhcoN.pdf",
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "portal.user",
+  "fields": {
+    "password": "pbkdf2_sha256$870000$keMXVhn3IanG95zgwENSrG$XczglY2iXSsK8wjyKIu6Z6ZfjXXsrrtSdzUpwgJin+U=",
+    "last_login": null,
+    "is_superuser": false,
+    "username": "Suza",
+    "first_name": "Suza Beach Hotel",
+    "last_name": "",
+    "email": "24mit001@suza.ac.tz",
+    "is_staff": false,
+    "is_active": true,
+    "date_joined": "2026-08-13T11:10:54.207Z",
+    "role": "hotel",
+    "phone": "+255716011109",
+    "address": "Tunguu",
+    "date_of_birth": null,
+    "gender": "",
+    "photo": "",
+    "cv": "",
+    "recommendation_letter": "",
+    "academic_certificates": "",
+    "other_certificates": "",
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "portal.user",
+  "fields": {
+    "password": "pbkdf2_sha256$870000$Cr2GjRz7ZK8X9k6G3pZFHc$8tzUGc/NqMRixejDaD8qxuj14KXCTQVktYy+ndgCny4=",
+    "last_login": null,
+    "is_superuser": false,
+    "username": "mamuu",
+    "first_name": "Maryam",
+    "last_name": "Khamis",
+    "email": "mkhamistz@gmail.com",
+    "is_staff": false,
+    "is_active": true,
+    "date_joined": "2026-08-13T11:30:57.020Z",
+    "role": "jobseeker",
+    "phone": "+255716011109",
+    "address": "Jumbi, Zanzibar",
+    "date_of_birth": "2026-08-13",
+    "gender": "Female",
+    "photo": "profiles/da_sarah.jpg",
+    "cv": "documents/Form_Four_Certificate_KQNeYdT.pdf",
+    "recommendation_letter": "documents/Form_six_certificate_jO0hSBn.pdf",
+    "academic_certificates": "documents/Form_six_certificate_iVrQjYi.pdf",
+    "other_certificates": "documents/Form_six_certificate_LnFAp5C.pdf",
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "portal.user",
+  "fields": {
+    "password": "pbkdf2_sha256$870000$zycXRANpqfmLU9CXRgyG2e$BygBxMIEbTJcxE3+RV+2kSIGFoe+u9ekoQCzvz/MFgY=",
+    "last_login": null,
+    "is_superuser": false,
+    "username": "Asha",
+    "first_name": "Asha",
+    "last_name": "Ali",
+    "email": "msagaladaines@gmail.com",
+    "is_staff": false,
+    "is_active": true,
+    "date_joined": "2026-08-14T14:26:30.225Z",
+    "role": "jobseeker",
+    "phone": "+255716011177",
+    "address": "Jumbi, Zanzibar",
+    "date_of_birth": "2007-08-09",
+    "gender": "Female",
+    "photo": "profiles/DAINESS_PHANUEL.jpg",
+    "cv": "documents/Bachelor_certificate2.pdf",
+    "recommendation_letter": "documents/ACADEMIC_EXCELENCE.pdf",
+    "academic_certificates": "documents/cheti_Cha_kuzaliwa.pdf",
+    "other_certificates": "documents/DAINESS_PHANUEL_TRANSCRIPT.pdf",
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "portal.user",
+  "fields": {
+    "password": "pbkdf2_sha256$870000$4vMZmYy0QiW2lRcWVjo530$zq2DiVd7+PKewqFkWrxtZPHdiuMqmGNTUhdtsn379L4=",
+    "last_login": null,
+    "is_superuser": false,
+    "username": "yuu",
+    "first_name": "dfghjuo",
+    "last_name": "",
+    "email": "msagaladaines@gmail.com",
+    "is_staff": false,
+    "is_active": true,
+    "date_joined": "2026-08-14T15:04:47.551Z",
+    "role": "hotel",
+    "phone": "0716011177",
+    "address": "Jumbi, Zanzibar",
+    "date_of_birth": null,
+    "gender": "",
+    "photo": "",
+    "cv": "",
+    "recommendation_letter": "",
+    "academic_certificates": "",
+    "other_certificates": "",
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "portal.user",
+  "fields": {
+    "password": "pbkdf2_sha256$870000$diBsRXKFG68DvJhy5IxOL1$3qQDNgqOWe9/cNrQoWP6TNpDzx1XG2s2lolrhuzuZiQ=",
+    "last_login": null,
+    "is_superuser": false,
+    "username": "Abuu",
+    "first_name": "Abuu",
+    "last_name": "Makame",
+    "email": "abuu123@gmail.com",
+    "is_staff": false,
+    "is_active": true,
+    "date_joined": "2026-09-05T18:39:49.491Z",
+    "role": "jobseeker",
+    "phone": "+255716011177",
+    "address": "Jumbi, Zanzibar",
+    "date_of_birth": "1990-06-05",
+    "gender": "Male",
+    "photo": "profiles/dani.jpg",
+    "cv": "documents/Form_Four_Certificate_hcPIBJp.pdf",
+    "recommendation_letter": "documents/Form_six_certificate_NQvxteG.pdf",
+    "academic_certificates": "documents/Form_Four_Certificate_cPnCskX.pdf",
+    "other_certificates": "documents/Form_six_certificate_p5TFNm9.pdf",
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "portal.user",
+  "fields": {
+    "password": "pbkdf2_sha256$870000$dB42n2b7lGfAMRKGJV7dDr$TcaXGK/NVcY11AjyS4ye2Kj+1zZUNYUx1kFiZJ6xbUk=",
+    "last_login": null,
+    "is_superuser": false,
+    "username": "Verde12",
+    "first_name": "Verde Luxury Hotel",
+    "last_name": "",
+    "email": "msagaladaines@gmail.com",
+    "is_staff": false,
+    "is_active": true,
+    "date_joined": "2026-09-05T18:52:19.776Z",
+    "role": "hotel",
+    "phone": "0716011177",
+    "address": "Jumbi, Zanzibar",
+    "date_of_birth": null,
+    "gender": "",
+    "photo": "",
+    "cv": "",
+    "recommendation_letter": "",
+    "academic_certificates": "",
+    "other_certificates": "",
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "portal.hotel",
+  "pk": 1,
+  "fields": {
+    "user": [
+      "Alma"
+    ],
+    "name": "Alma Beach Hotel",
+    "image": "hotels/1726813136610.jpeg",
+    "location": "Jumbi",
+    "latitude": null,
+    "longitude": null,
+    "tin": "123465778",
+    "registration_number": "T12Z62234",
+    "business_license": "licenses/Form_six_certificate.pdf",
+    "approved": true,
+    "star_rating": 0,
+    "created_at": "2026-08-04T17:30:08.919Z"
+  }
+},
+{
+  "model": "portal.hotel",
+  "pk": 2,
+  "fields": {
+    "user": [
+      "Aluna"
+    ],
+    "name": "Aluna Beach Resort",
+    "image": "hotels/hotel_logo.jpeg",
+    "location": "Paje",
+    "latitude": "12.000000",
+    "longitude": "17.000000",
+    "tin": "T123GB",
+    "registration_number": "Z8475858DD FF",
+    "business_license": "licenses/Tokenizers_for_African_Languages.pdf",
+    "approved": true,
+    "star_rating": 0,
+    "created_at": "2026-08-05T17:00:04.797Z"
+  }
+},
+{
+  "model": "portal.hotel",
+  "pk": 3,
+  "fields": {
+    "user": [
+      "Azam"
+    ],
+    "name": "Verde Luxuly Beach Hotel",
+    "image": "hotels/1726813136610_UA09em6.jpeg",
+    "location": "Bububu",
+    "latitude": "-6.135732",
+    "longitude": "39.213237",
+    "tin": "ZT123GTB",
+    "registration_number": "Z8475858DDTFF",
+    "business_license": "licenses/Form_six_certificate_aoFfjR8.pdf",
+    "approved": true,
+    "star_rating": 5,
+    "created_at": "2026-08-07T12:45:23.559Z"
+  }
+},
+{
+  "model": "portal.hotel",
+  "pk": 4,
+  "fields": {
+    "user": [
+      "Shukrani"
+    ],
+    "name": "Shukrani Palace",
+    "image": "hotels/1726813135580.jpeg",
+    "location": "Michamvi",
+    "latitude": "-6.138913",
+    "longitude": "39.513672",
+    "tin": "SMZ12329",
+    "registration_number": "TZ32198",
+    "business_license": "licenses/Form_six_certificate_gdwzAfw.pdf",
+    "approved": true,
+    "star_rating": 0,
+    "created_at": "2026-08-07T13:29:37.119Z"
+  }
+},
+{
+  "model": "portal.hotel",
+  "pk": 5,
+  "fields": {
+    "user": [
+      "Aluna123"
+    ],
+    "name": "Aluna Boutique Beach Hotel",
+    "image": "hotels/Medium_instruction.jpeg",
+    "location": "Paje",
+    "latitude": "-6.267849",
+    "longitude": "37.534387",
+    "tin": "TZ121314",
+    "registration_number": "SMZ121114",
+    "business_license": "licenses/DAINESS_PHANUEL_CV.pdf",
+    "approved": true,
+    "star_rating": 0,
+    "created_at": "2026-08-13T09:17:55.057Z"
+  }
+},
+{
+  "model": "portal.hotel",
+  "pk": 6,
+  "fields": {
+    "user": [
+      "Suza"
+    ],
+    "name": "Suza Beach Hotel",
+    "image": "hotels/1726813135580_1SxncRH.jpeg",
+    "location": "Tunguu",
+    "latitude": "-6.488330",
+    "longitude": "39.453297",
+    "tin": "TZ9091223",
+    "registration_number": "SMZ844373",
+    "business_license": "licenses/Form_Four_Certificate.pdf",
+    "approved": true,
+    "star_rating": 0,
+    "created_at": "2026-08-13T11:10:55.017Z"
+  }
+},
+{
+  "model": "portal.hotel",
+  "pk": 7,
+  "fields": {
+    "user": [
+      "yuu"
+    ],
+    "name": "dfghjuo",
+    "image": "hotels/My_passport.jpg",
+    "location": "Jumbi, Zanzibar",
+    "latitude": "4.000000",
+    "longitude": "67.000000",
+    "tin": "yuuhv668",
+    "registration_number": "to6t6uyg9",
+    "business_license": "licenses/DAINESS_PHANUEL_PASSPORT.pdf",
+    "approved": true,
+    "star_rating": 4,
+    "created_at": "2026-08-14T15:04:48.185Z"
+  }
+},
+{
+  "model": "portal.hotel",
+  "pk": 8,
+  "fields": {
+    "user": [
+      "Verde12"
+    ],
+    "name": "Verde Luxury Hotel",
+    "image": "hotels/1726813135864.jpeg",
+    "location": "Jumbi, Zanzibar",
+    "latitude": "-6.135943",
+    "longitude": "39.213217",
+    "tin": "ZT123GTB21",
+    "registration_number": "Z8475858DD12FF",
+    "business_license": "licenses/Form_six_certificate_27xzvWj.pdf",
+    "approved": true,
+    "star_rating": 5,
+    "created_at": "2026-09-05T18:52:20.544Z"
+  }
+},
+{
+  "model": "portal.job",
+  "pk": 1,
+  "fields": {
+    "hotel": 1,
+    "title": "Reception",
+    "position": "Staff",
+    "category": "Reception",
+    "description": "none",
+    "experience": "2 years",
+    "gender": "Female",
+    "deadline": "2026-09-10",
+    "active": true,
+    "created_at": "2026-08-04T17:38:27.223Z"
+  }
+},
+{
+  "model": "portal.job",
+  "pk": 2,
+  "fields": {
+    "hotel": 1,
+    "title": "Waiter",
+    "position": "Staff",
+    "category": "Food & Beverage",
+    "description": "Urgently\n",
+    "experience": "3",
+    "gender": "Any",
+    "deadline": "2026-09-06",
+    "active": true,
+    "created_at": "2026-08-05T16:17:38.421Z"
+  }
+},
+{
+  "model": "portal.job",
+  "pk": 3,
+  "fields": {
+    "hotel": 2,
+    "title": "Reservation",
+    "position": "Manager",
+    "category": "Management",
+    "description": "Urgently",
+    "experience": "2 years",
+    "gender": "Any",
+    "deadline": "2026-09-04",
+    "active": true,
+    "created_at": "2026-08-05T17:03:01.171Z"
+  }
+},
+{
+  "model": "portal.job",
+  "pk": 4,
+  "fields": {
+    "hotel": 3,
+    "title": "Hot Kitchen Chef",
+    "position": "Staff",
+    "category": "Kitchen",
+    "description": "Urgent Needed",
+    "experience": "3 years",
+    "gender": "Male",
+    "deadline": "2026-08-14",
+    "active": true,
+    "created_at": "2026-08-07T13:01:33.726Z"
+  }
+},
+{
+  "model": "portal.job",
+  "pk": 5,
+  "fields": {
+    "hotel": 4,
+    "title": "Human Resource",
+    "position": "Manager",
+    "category": "Management",
+    "description": "9 Hours Of Working Daily\n",
+    "experience": "2 years",
+    "gender": "Female",
+    "deadline": "2026-08-10",
+    "active": true,
+    "created_at": "2026-08-07T13:32:01.937Z"
+  }
+},
+{
+  "model": "portal.job",
+  "pk": 6,
+  "fields": {
+    "hotel": 5,
+    "title": "IT Manager",
+    "position": "Manager",
+    "category": "Management",
+    "description": "Know your responsibilities",
+    "experience": "3 years",
+    "gender": "Male",
+    "deadline": "2026-08-16",
+    "active": true,
+    "created_at": "2026-08-13T09:19:56.446Z"
+  }
+},
+{
+  "model": "portal.job",
+  "pk": 7,
+  "fields": {
+    "hotel": 5,
+    "title": "Room Attendant",
+    "position": "Staff",
+    "category": "Housekeeping",
+    "description": "none",
+    "experience": "1 year",
+    "gender": "Female",
+    "deadline": "2026-08-15",
+    "active": true,
+    "created_at": "2026-08-13T10:28:25.973Z"
+  }
+},
+{
+  "model": "portal.job",
+  "pk": 8,
+  "fields": {
+    "hotel": 7,
+    "title": "Laundly",
+    "position": "Staff",
+    "category": "Housekeeping",
+    "description": "know your duties",
+    "experience": "2 years",
+    "gender": "Any",
+    "deadline": "2026-08-20",
+    "active": true,
+    "created_at": "2026-08-14T15:30:32.926Z"
+  }
+},
+{
+  "model": "portal.job",
+  "pk": 9,
+  "fields": {
+    "hotel": 7,
+    "title": "Laundly",
+    "position": "Staff",
+    "category": "Housekeeping",
+    "description": "Know your duties",
+    "experience": "2 years",
+    "gender": "Any",
+    "deadline": "2026-08-20",
+    "active": true,
+    "created_at": "2026-08-14T15:31:28.664Z"
+  }
+},
+{
+  "model": "portal.job",
+  "pk": 10,
+  "fields": {
+    "hotel": 7,
+    "title": "Laundly",
+    "position": "Staff",
+    "category": "Housekeeping",
+    "description": "Know your duties",
+    "experience": "2 years",
+    "gender": "Any",
+    "deadline": "2026-08-20",
+    "active": true,
+    "created_at": "2026-08-14T15:32:01.884Z"
+  }
+},
+{
+  "model": "portal.job",
+  "pk": 11,
+  "fields": {
+    "hotel": 7,
+    "title": "Laundly",
+    "position": "Staff",
+    "category": "Housekeeping",
+    "description": "Know your duties",
+    "experience": "2 years",
+    "gender": "Any",
+    "deadline": "2026-08-20",
+    "active": true,
+    "created_at": "2026-08-14T15:32:04.168Z"
+  }
+},
+{
+  "model": "portal.job",
+  "pk": 12,
+  "fields": {
+    "hotel": 7,
+    "title": "Laundly",
+    "position": "Staff",
+    "category": "Housekeeping",
+    "description": "Know your duties",
+    "experience": "2 years",
+    "gender": "Any",
+    "deadline": "2026-08-20",
+    "active": true,
+    "created_at": "2026-08-14T15:32:04.387Z"
+  }
+},
+{
+  "model": "portal.job",
+  "pk": 13,
+  "fields": {
+    "hotel": 8,
+    "title": "Maintainace",
+    "position": "Staff",
+    "category": "Maintenance",
+    "description": "None",
+    "experience": "2 years",
+    "gender": "Male",
+    "deadline": "2026-09-12",
+    "active": true,
+    "created_at": "2026-09-05T18:56:58.717Z"
+  }
+},
+{
+  "model": "portal.job",
+  "pk": 14,
+  "fields": {
+    "hotel": 8,
+    "title": "Chef",
+    "position": "Head",
+    "category": "Kitchen",
+    "description": "Know your responsibilities",
+    "experience": "3 years",
+    "gender": "Male",
+    "deadline": "2026-09-11",
+    "active": true,
+    "created_at": "2026-09-07T03:56:33.880Z"
+  }
+},
+{
+  "model": "portal.application",
+  "pk": 5,
+  "fields": {
+    "job": 5,
+    "applicant": [
+      "Dainess"
+    ],
+    "applicant_note": "Please i have apply it mistakenly",
+    "status": "accepted",
+    "feedback": "Welcome, visit us tomorrow\n",
+    "created_at": "2026-08-07T13:37:21.695Z",
+    "updated_at": "2026-08-07T13:40:01.878Z"
+  }
+},
+{
+  "model": "portal.application",
+  "pk": 6,
+  "fields": {
+    "job": 6,
+    "applicant": [
+      "Dainess"
+    ],
+    "applicant_note": "",
+    "status": "accepted",
+    "feedback": "Welcome",
+    "created_at": "2026-08-13T10:15:03.663Z",
+    "updated_at": "2026-08-13T10:15:58.860Z"
+  }
+},
+{
+  "model": "portal.application",
+  "pk": 7,
+  "fields": {
+    "job": 4,
+    "applicant": [
+      "mamuu"
+    ],
+    "applicant_note": "",
+    "status": "pending",
+    "feedback": "",
+    "created_at": "2026-08-13T11:39:57.990Z",
+    "updated_at": "2026-08-13T11:39:57.990Z"
+  }
+},
+{
+  "model": "portal.application",
+  "pk": 8,
+  "fields": {
+    "job": 7,
+    "applicant": [
+      "mamuu"
+    ],
+    "applicant_note": "",
+    "status": "accepted",
+    "feedback": "fdgfdhghgfhg",
+    "created_at": "2026-08-13T11:49:42.983Z",
+    "updated_at": "2026-08-13T11:52:07.175Z"
+  }
+},
+{
+  "model": "portal.application",
+  "pk": 9,
+  "fields": {
+    "job": 6,
+    "applicant": [
+      "Asha"
+    ],
+    "applicant_note": "",
+    "status": "pending",
+    "feedback": "",
+    "created_at": "2026-08-14T14:28:39.905Z",
+    "updated_at": "2026-08-14T14:28:39.905Z"
+  }
+},
+{
+  "model": "portal.application",
+  "pk": 10,
+  "fields": {
+    "job": 13,
+    "applicant": [
+      "Akram"
+    ],
+    "applicant_note": "fdfcvccfjbvh",
+    "status": "accepted",
+    "feedback": "meet us tomorrow morning",
+    "created_at": "2026-09-05T19:02:02.542Z",
+    "updated_at": "2026-09-05T19:07:41.007Z"
+  }
+},
+{
+  "model": "portal.application",
+  "pk": 11,
+  "fields": {
+    "job": 13,
+    "applicant": [
+      "mamuu"
+    ],
+    "applicant_note": "",
+    "status": "pending",
+    "feedback": "",
+    "created_at": "2026-09-07T03:53:29.026Z",
+    "updated_at": "2026-09-07T03:53:29.026Z"
+  }
+},
+{
+  "model": "portal.apitoken",
+  "pk": 2,
+  "fields": {
+    "user": [
+      "Gidion"
+    ],
+    "key": "0a442978e2619dd5767aa7959a1c42785c4e88564b432c23b478db4ad176bd0a",
+    "created_at": "2026-08-04T17:33:48.689Z"
+  }
+},
+{
+  "model": "portal.apitoken",
+  "pk": 3,
+  "fields": {
+    "user": [
+      "Alma"
+    ],
+    "key": "c274b130a7064ee144e5e4254f20711648eb0430eac9cf271015281e029b4e9d",
+    "created_at": "2026-08-04T17:35:44.260Z"
+  }
+},
+{
+  "model": "portal.apitoken",
+  "pk": 5,
+  "fields": {
+    "user": [
+      "Aluna"
+    ],
+    "key": "b1cd7415a5fd50f7aceca8bcd57e970fbf95697cb00f44a9708fa96bc01fc071",
+    "created_at": "2026-08-05T17:01:51.313Z"
+  }
+},
+{
+  "model": "portal.apitoken",
+  "pk": 7,
+  "fields": {
+    "user": [
+      "IT MANAGER"
+    ],
+    "key": "71fcfc8d094e413d8f7ab571fcc478fc312888292443c6ebc29e1bbd963e7aa4",
+    "created_at": "2026-08-07T12:38:49.933Z"
+  }
+},
+{
+  "model": "portal.apitoken",
+  "pk": 8,
+  "fields": {
+    "user": [
+      "Azam"
+    ],
+    "key": "0a9fabbd347bd207b596c431f9e75aba08931f486554cb0948792ceb1de6b00e",
+    "created_at": "2026-08-07T12:59:40.757Z"
+  }
+},
+{
+  "model": "portal.apitoken",
+  "pk": 9,
+  "fields": {
+    "user": [
+      "Shukrani"
+    ],
+    "key": "b687eb68715670b881527292ae2ae11250305eb787718e0f60a6a86a1c663f83",
+    "created_at": "2026-08-07T13:30:15.154Z"
+  }
+},
+{
+  "model": "portal.apitoken",
+  "pk": 10,
+  "fields": {
+    "user": [
+      "Dainess"
+    ],
+    "key": "ac39abca34a4ba7def2d63e45ca16ff99136ff98cf6378b229d78c18d22b78ca",
+    "created_at": "2026-08-07T14:14:18.517Z"
+  }
+},
+{
+  "model": "portal.apitoken",
+  "pk": 11,
+  "fields": {
+    "user": [
+      "Akram"
+    ],
+    "key": "20bfd1129c77e6689379753c93b34b9a44a455cbbbc5a1e5a80ab94f69a78492",
+    "created_at": "2026-08-13T09:09:32.118Z"
+  }
+},
+{
+  "model": "portal.apitoken",
+  "pk": 12,
+  "fields": {
+    "user": [
+      "Aluna123"
+    ],
+    "key": "8905ff1032b052129e95ef5ad84645b78421cf502652a40117c2f06ac302e590",
+    "created_at": "2026-08-13T09:18:41.295Z"
+  }
+},
+{
+  "model": "portal.apitoken",
+  "pk": 13,
+  "fields": {
+    "user": [
+      "testseeker20260813134911"
+    ],
+    "key": "6220c2b0bb0088dff4251624e9095e28749772db592f90d24a074865d516cb75",
+    "created_at": "2026-08-13T10:49:17.360Z"
+  }
+},
+{
+  "model": "portal.apitoken",
+  "pk": 14,
+  "fields": {
+    "user": [
+      "Suza"
+    ],
+    "key": "f0b0f6e73b4f2b86d93b08680c4bd468f328cb7be1d6c9d60db0b8287f92ff53",
+    "created_at": "2026-08-13T11:13:47.056Z"
+  }
+},
+{
+  "model": "portal.apitoken",
+  "pk": 15,
+  "fields": {
+    "user": [
+      "mamuu"
+    ],
+    "key": "0a7b93549ae2231eb5cde33ca3bdef8028598baf9ae44ad757a2224707e495ae",
+    "created_at": "2026-08-13T11:31:28.344Z"
+  }
+},
+{
+  "model": "portal.apitoken",
+  "pk": 16,
+  "fields": {
+    "user": [
+      "Asha"
+    ],
+    "key": "f6619bd542506a63052afe41a3465640a62966f87dec445840e582b5d2b10eda",
+    "created_at": "2026-08-14T14:27:14.113Z"
+  }
+},
+{
+  "model": "portal.apitoken",
+  "pk": 17,
+  "fields": {
+    "user": [
+      "yuu"
+    ],
+    "key": "0ef3cf25a2f310381342cbe2f456df3bbcde2b6e6848b908333e6466630e36a5",
+    "created_at": "2026-08-14T15:29:24.541Z"
+  }
+},
+{
+  "model": "portal.apitoken",
+  "pk": 18,
+  "fields": {
+    "user": [
+      "Verde12"
+    ],
+    "key": "d08c2766bd9046456ab6f24282350291f74a1db2adaece72eb55211fbeb6474a",
+    "created_at": "2026-09-05T18:55:25.643Z"
+  }
+},
+{
+  "model": "portal.sitesetting",
+  "pk": 1,
+  "fields": {
+    "portal_name": "ZanHotel Ajira Portal",
+    "support_email": "support@zanhotel.go.tz",
+    "maintenance_mode": true,
+    "hero_eyebrow": "Zanzibar's hospitality careers platform",
+    "hero_title": "Your next opportunity starts here.",
+    "hero_subtitle": "Discover verified hotel vacancies across Zanzibar. Build your profile once, apply with confidence.",
+    "hero_image": "",
+    "recent_jobs_days": 3
+  }
+},
+{
+  "model": "admin.logentry",
+  "pk": 1,
+  "fields": {
+    "action_time": "2026-08-07T12:35:19.817Z",
+    "user": [
+      "Gidion"
+    ],
+    "content_type": [
+      "portal",
+      "user"
+    ],
+    "object_id": "4",
+    "object_repr": "GmG",
+    "action_flag": 3,
+    "change_message": ""
+  }
+},
+{
+  "model": "admin.logentry",
+  "pk": 2,
+  "fields": {
+    "action_time": "2026-08-07T12:35:19.817Z",
+    "user": [
+      "Gidion"
+    ],
+    "content_type": [
+      "portal",
+      "user"
+    ],
+    "object_id": "2",
+    "object_repr": "Meshack",
+    "action_flag": 3,
+    "change_message": ""
+  }
+},
+{
+  "model": "admin.logentry",
+  "pk": 3,
+  "fields": {
+    "action_time": "2026-08-07T13:20:05.839Z",
+    "user": [
+      "Gidion"
+    ],
+    "content_type": [
+      "portal",
+      "hotel"
+    ],
+    "object_id": "3",
+    "object_repr": "Hotel object (3)",
+    "action_flag": 2,
+    "change_message": "[{\"changed\": {\"fields\": [\"Latitude\", \"Longitude\"]}}]"
+  }
+},
+{
+  "model": "admin.logentry",
+  "pk": 4,
+  "fields": {
+    "action_time": "2026-08-13T11:47:29.391Z",
+    "user": [
+      "Gidion"
+    ],
+    "content_type": [
+      "portal",
+      "user"
+    ],
+    "object_id": "10",
+    "object_repr": "Azam",
+    "action_flag": 2,
+    "change_message": "[{\"changed\": {\"fields\": [\"password\"]}}]"
+  }
+}
+]
